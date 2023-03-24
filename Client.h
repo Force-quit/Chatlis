@@ -1,14 +1,10 @@
-// Copyright (C) 2016 The Qt Company Ltd.
-// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR BSD-3-Clause
-
-#ifndef CLIENT_H
-#define CLIENT_H
+#pragma once
 
 #include <QAbstractSocket>
 #include <QHash>
 #include <QHostAddress>
 
-#include "server.h"
+#include "Server.h"
 
 class PeerManager;
 
@@ -41,5 +37,3 @@ private:
     Server server;
     QMultiHash<QHostAddress, Connection*> peers;
 };
-
-#endif
