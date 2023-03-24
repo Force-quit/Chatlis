@@ -1,9 +1,17 @@
 #pragma once
 
-#include "ui_chatdialog.h"
-#include "client.h"
+#include "Client.h"
+#include <QtCore/QVariant>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QDialog>
+#include <QtWidgets/QHBoxLayout>
+#include <QtWidgets/QLabel>
+#include <QtWidgets/QLineEdit>
+#include <QtWidgets/QListWidget>
+#include <QtWidgets/QTextEdit>
+#include <QtWidgets/QVBoxLayout>
 
-class ChatDialog : public QDialog, private Ui::ChatDialog
+class ChatDialog : public QDialog
 {
     Q_OBJECT
 
@@ -23,4 +31,13 @@ private:
     Client client;
     QString myNickName;
     QTextTableFormat tableFormat;
+
+
+    QVBoxLayout* vboxLayout;
+    QHBoxLayout* hboxLayout;
+    QTextEdit* textEdit;
+    QListWidget* listWidget;
+    QHBoxLayout* hboxLayout1;
+    QLabel* label;
+    QLineEdit* lineEdit;
 };

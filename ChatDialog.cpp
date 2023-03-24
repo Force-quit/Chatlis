@@ -8,7 +8,53 @@
 ChatDialog::ChatDialog(QWidget* parent)
     : QDialog(parent)
 {
-    setupUi(this);
+    if (objectName().isEmpty())
+        setObjectName("ChatDialog");
+    resize(513, 349);
+    vboxLayout = new QVBoxLayout();
+
+    vboxLayout->setObjectName("vboxLayout");
+    hboxLayout = new QHBoxLayout();
+
+    hboxLayout->setObjectName("hboxLayout");
+    textEdit = new QTextEdit();
+    textEdit->setObjectName("textEdit");
+    textEdit->setFocusPolicy(Qt::NoFocus);
+    textEdit->setReadOnly(true);
+
+    hboxLayout->addWidget(textEdit);
+
+    listWidget = new QListWidget();
+    listWidget->setObjectName("listWidget");
+    listWidget->setMaximumSize(QSize(180, 16777215));
+    listWidget->setFocusPolicy(Qt::NoFocus);
+
+    hboxLayout->addWidget(listWidget);
+
+
+    vboxLayout->addLayout(hboxLayout);
+
+    hboxLayout1 = new QHBoxLayout();
+    hboxLayout1->setContentsMargins(0, 0, 0, 0);
+    hboxLayout1->setObjectName("hboxLayout1");
+    label = new QLabel();
+    label->setObjectName("label");
+
+    hboxLayout1->addWidget(label);
+
+    lineEdit = new QLineEdit();
+    lineEdit->setObjectName("lineEdit");
+
+    hboxLayout1->addWidget(lineEdit);
+
+
+    vboxLayout->addLayout(hboxLayout1);
+
+
+    this->setWindowTitle(QCoreApplication::translate("ChatDialog", "Chat", nullptr));
+    label->setText(QCoreApplication::translate("ChatDialog", "Message:", nullptr));
+
+    QMetaObject::connectSlotsByName(this);
 
     lineEdit->setFocusPolicy(Qt::StrongFocus);
     textEdit->setFocusPolicy(Qt::NoFocus);
