@@ -1,11 +1,16 @@
 #include "QChatRoomMainWindow.h"
 #include <QVBoxLayout>
-#include "ChatDialog.h"
+#include "QChatbox.h"
+#include <QTimer>
+#include <QIcon>
 
 QChatRoomMainWindow::QChatRoomMainWindow(QWidget *parent)
-	: QMainWindow(parent)
+	: QMainWindow(parent), chatbox{ new QChatbox }
 {
-	setCentralWidget(new ChatDialog);
+	resize(650, 350);
+	setCentralWidget(chatbox);
+	setWindowTitle("Chatlis");
+	setWindowIcon(QIcon("group-chat.png"));
 }
 
 QChatRoomMainWindow::~QChatRoomMainWindow() {}

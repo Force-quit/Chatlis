@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QMainWindow>
+#include "QChatbox.h"
 
 class QChatRoomMainWindow : public QMainWindow
 {
@@ -11,5 +12,5 @@ public:
 	~QChatRoomMainWindow();
 
 private:
-	
+	QChatbox* chatbox;
 };
