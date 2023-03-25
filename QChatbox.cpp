@@ -4,6 +4,7 @@
 #include <QScrollBar>
 #include <QColor>
 #include <QDateTime>
+#include <QSizePolicy>
 
 const QColor QChatbox::USER_MIGRATION_TEXT_COLOR{ Qt::gray };
 const QColor QChatbox::USER_MESSAGE_TEXT_COLOR{ Qt::black };
@@ -11,19 +12,27 @@ const QColor QChatbox::USER_MESSAGE_TEXT_COLOR{ Qt::black };
 QChatbox::QChatbox(QWidget *parent)
 	: QTextEdit(parent)
 {
+    QSizePolicy modifiedPolicy{ sizePolicy() };
+    modifiedPolicy.setHorizontalStretch(4);
+    setSizePolicy(modifiedPolicy);
+
     setFocusPolicy(Qt::NoFocus);
     setReadOnly(true);
     setTextColor(QChatbox::USER_MESSAGE_TEXT_COLOR);
+
+    participantJoined("Emalice");
+    appendMessage("Emalice", "Yo wassup");
+    participantLeft("Emalice");
 }
 
-void QChatbox::userJoined(const QString & nick)
+void QChatbox::participantJoined(const QString & nick)
 {
     setTextColor(QChatbox::USER_MIGRATION_TEXT_COLOR);
     appendText(tr("%1 has joined").arg(nick));
     setTextColor(QChatbox::USER_MESSAGE_TEXT_COLOR);
 }
 
-void QChatbox::userLeft(const QString& nick)
+void QChatbox::participantLeft(const QString& nick)
 {
     setTextColor(QChatbox::USER_MIGRATION_TEXT_COLOR);
     appendText(tr("%1 has left").arg(nick));

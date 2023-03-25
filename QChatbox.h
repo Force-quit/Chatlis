@@ -14,8 +14,8 @@ public:
 
 public slots:
 	void appendMessage(const QString& from, const QString& message);
-	void userJoined(const QString& nick);
-	void userLeft(const QString& nick);
+	void participantJoined(const QString& nick);
+	void participantLeft(const QString& nick);
 
 private:
 	static const QColor USER_MIGRATION_TEXT_COLOR;
