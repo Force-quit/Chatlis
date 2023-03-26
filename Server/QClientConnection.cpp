@@ -9,7 +9,7 @@ QClientConnection::QClientConnection(QObject* parent, QTcpSocket* socket)
 
 void QClientConnection::receivedData()
 {
-	emit messageReceived(socket->readAll());
+	emit messageReceived(socket->readAll(), this);
 }
 
 void QClientConnection::clientDisconnected()
@@ -31,4 +31,11 @@ QString QClientConnection::peerName() const
 QString QClientConnection::peerAddress() const
 {
 	return socket->peerAddress().toString();
+}
+
+void QClientConnection::sendMessage(QString message, QClientConnection* sender)
+{
+	QString output = '[' + sender->peerName() + "] : " + message;
+
+	socket->write(output.toUtf8());
 }
