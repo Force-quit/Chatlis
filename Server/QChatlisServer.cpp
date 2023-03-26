@@ -35,9 +35,13 @@ quint16 QChatlisServer::listeningPort() const
 	return currentListeningPort;
 }
 
-void QChatlisServer::messageReceived(QString message)
+void QChatlisServer::messageReceived(QString message, QClientConnection* sender)
 {
-	emit newOutput(message);
+	emit newOutput("[" + sender->peerName() + "] : " + message);
+	for (auto i : connectedClients)
+		if (i != sender)
+			newOutput("Log: sent message to [" + i->peerName() + "]");
+			//i->sendMessage(message);
 }
 
 void QChatlisServer::clientDisconnected(QClientConnection* disconnectedClient)

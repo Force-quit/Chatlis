@@ -20,7 +20,7 @@ signals:
 
 private slots:
     void incomingConnection();
-    void messageReceived(QString message);
+    void messageReceived(QString message, QClientConnection* sender);
     void clientDisconnected(QClientConnection* disconnectedClient);
 
 private:

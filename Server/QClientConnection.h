@@ -14,7 +14,7 @@ public:
 	QString peerAddress() const;
 
 signals:
-	void messageReceived(QString message);
+	void messageReceived(QString message, QClientConnection* sender);
 	void notifyDisconnect(QClientConnection* disconnectedClient);
 
 private slots:

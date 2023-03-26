@@ -9,7 +9,7 @@ QClientConnection::QClientConnection(QObject* parent, QTcpSocket* socket)
 
 void QClientConnection::receivedData()
 {
-	emit messageReceived(socket->readAll());
+	emit messageReceived(socket->readAll(), this);
 }
 
 void QClientConnection::clientDisconnected()
