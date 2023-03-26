@@ -13,6 +13,8 @@ public:
 	QString peerName() const;
 	QString peerAddress() const;
 
+	void sendMessage(QString message, QClientConnection* sender);
+
 signals:
 	void messageReceived(QString message, QClientConnection* sender);
 	void notifyDisconnect(QClientConnection* disconnectedClient);

@@ -17,8 +17,10 @@ void QChatlisServer::incomingConnection()
 {
 	QTcpSocket* incomingNewConnection{ nextPendingConnection() };
 	QClientConnection* newClient{ new QClientConnection(this, incomingNewConnection) };
-
-	connectedClients.insert(newClient->peerName(), newClient);
+	QChar append = '*';
+	QString name = newClient->peerName();
+	name.append(QString(connectedClients.size(), append));
+	connectedClients.insert(name, newClient);
 	emit newOutput("Log : connection opened with client [" + newClient->peerName() + ']');
 	connect(newClient, &QClientConnection::messageReceived, this, &QChatlisServer::messageReceived);
 	connect(newClient, &QClientConnection::notifyDisconnect, this, &QChatlisServer::clientDisconnected);
@@ -39,9 +41,11 @@ void QChatlisServer::messageReceived(QString message, QClientConnection* sender)
 {
 	emit newOutput("[" + sender->peerName() + "] : " + message);
 	for (auto i : connectedClients)
-		if (i != sender)
+		if (i != sender) {
+			i->sendMessage(message, sender);
 			newOutput("Log: sent message to [" + i->peerName() + "]");
-			//i->sendMessage(message);
+		}
+			
 }
 
 void QChatlisServer::clientDisconnected(QClientConnection* disconnectedClient)

@@ -32,3 +32,10 @@ QString QClientConnection::peerAddress() const
 {
 	return socket->peerAddress().toString();
 }
+
+void QClientConnection::sendMessage(QString message, QClientConnection* sender)
+{
+	QString output = '[' + sender->peerName() + "] : " + message;
+
+	socket->write(output.toUtf8());
+}
