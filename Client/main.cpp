@@ -5,7 +5,7 @@
 
 int main(int argc, char* argv[])
 {
-    QLockFile lockFile(QDir::tempPath() + "/ChatlisTemp.lock");
+    QLockFile lockFile(QDir::tempPath() + "/ChatlisClient.lock");
     if (!lockFile.tryLock()) 
         return 0;
 
