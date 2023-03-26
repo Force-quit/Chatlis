@@ -4,15 +4,16 @@
 #include <QString>
 #include <QHostAddress>
 
-class QClient  : public QObject
+class QClientInfo  : public QObject
 {
 	Q_OBJECT
 
 public:
-	QClient(QObject *parent);
-	~QClient();
+	QClientInfo(QObject *parent = nullptr);
+	~QClientInfo();
 
-	QString nickName() const;
+	QString getUsername() const;
+	QString getComputerName() const;
 
 	void setUsername(const QString& newName);
 	void setComputerName(const QString& newComputerName);

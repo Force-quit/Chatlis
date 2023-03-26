@@ -1,28 +1,28 @@
 #pragma once
 
 #include <QTcpSocket>
+#include "../QClientInfo.h"
 
-class QClientConnection : public QObject
+class QClientConnection : public QTcpSocket
 {
 	Q_OBJECT
 
 public:
-	QClientConnection(QObject* parent, QTcpSocket* socket);
+	QClientConnection(QObject* parent);
 	~QClientConnection();
 
-	QString peerName() const;
-	QString peerAddress() const;
-
-	void sendMessage(QString message, QClientConnection* sender);
+	void replicateClientMessage(const QString& clientName, const QString& message);
+	void replicateNewClient(const QString& clientName, const QString& computerName);
 
 signals:
-	void messageReceived(QString message, QClientConnection* sender);
-	void notifyDisconnect(QClientConnection* disconnectedClient);
+	void newClient(const QString username, const QString computerName);
+	void newClientMessage(const QString clientName, const QString message);
 
 private slots:
 	void receivedData();
-	void clientDisconnected();
 
 private:
-	QTcpSocket* socket;
+	void sendNetworkMessage(const QByteArray& toSend);
+
+	QClientInfo client;
 };

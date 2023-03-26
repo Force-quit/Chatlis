@@ -1,10 +1,14 @@
 #include "QServerConnection.h"
 #include <QHostAddress>
+#include <QDataStream>
+#include <QByteArray>
+#include "../NetworkMessage.h"
 
 QServerConnection::QServerConnection(QObject* parent)
 	: QTcpSocket(parent), client(this)
 {
-	connect(this, &QAbstractSocket::connected, this, &QServerConnection::connectedToServer);
+	connect(this, &QAbstractSocket::connected, this, &QServerConnection::shareClientInfo);
+	connect(this, &QIODevice::readyRead, this, &QServerConnection::receivedData);
 }
 
 void QServerConnection::connectToServer(const QString& address, const QString& portNb)
@@ -14,9 +18,38 @@ void QServerConnection::connectToServer(const QString& address, const QString& p
 		connectToHost(temp, portNb.toUInt());
 }
 
-void QServerConnection::connectedToServer()
+void QServerConnection::shareClientInfo()
 {
-	//
+	QByteArray buffer;
+	QDataStream dataStream(&buffer, QIODevice::WriteOnly);
+	dataStream << NetworkMessage::Type::clientRegistration << client.getUsername() << client.getComputerName();
+
+	QDataStream dataToSend(this);
+	dataToSend << buffer;
+}
+
+void QServerConnection::receivedData()
+{
+	QByteArray buffer;
+	QDataStream dataStream(this);
+	dataStream >> buffer;
+	QDataStream processedData(buffer);
+
+	NetworkMessage::Type messageType{};
+	processedData >> messageType;
+
+	QString username;
+	QString computerName;
+
+	switch (messageType)
+	{
+	case NetworkMessage::Type::clientSentMessage:
+		break;
+	case NetworkMessage::Type::clientAdded:
+		break;
+	default:
+		break;
+	}
 }
 
 QServerConnection::~QServerConnection() {}

@@ -3,57 +3,60 @@
 #include <QTcpSocket>
 #include <QVector>
 
+
 const quint16 QChatlisServer::PORT_NB{ 59532 };
 
 QChatlisServer::QChatlisServer(QObject* parent)
 	: QTcpServer(parent), connectedClients()
 {
-	connect(this, &QTcpServer::pendingConnectionAvailable, this, &QChatlisServer::incomingConnection);
 	listen(QHostAddress::Any, QChatlisServer::PORT_NB);
-	currentListeningPort = serverPort();
+
 }
 
-void QChatlisServer::incomingConnection()
+void QChatlisServer::incomingConnection(qintptr socketDescriptor)
 {
-	QTcpSocket* incomingNewConnection{ nextPendingConnection() };
-	QClientConnection* newClient{ new QClientConnection(this, incomingNewConnection) };
+	QClientConnection* newClient{ new QClientConnection(this) };
+	newClient->setSocketDescriptor(socketDescriptor);
+	addPendingConnection(newClient);
+	emit newConnection();
 
-	QChar append = '*';
-	QString name = newClient->peerName();
-	name.append(QString(connectedClients.size(), append));
+	connect(newClient, &QClientConnection::newClient, this, &QChatlisServer::replicateNewUser);
+	connect(newClient, &QAbstractSocket::disconnected, this, &QChatlisServer::clientDisconnected);
+}
 
-	connectedClients.insert(name, newClient);
-	emit newOutput("Log : connection opened with client [" + newClient->peerName() + ']');
+void QChatlisServer::replicateNewUser(const QString username, const QString computerName)
+{
+	QClientConnection* senderConnection{ dynamic_cast<QClientConnection*>(sender()) };
 
-	connect(newClient, &QClientConnection::messageReceived, this, &QChatlisServer::messageReceived);
-	connect(newClient, &QClientConnection::notifyDisconnect, this, &QChatlisServer::clientDisconnected);
+	QString log("Log : connection opened with client [%1] (%2)");
+	emit serverLog(log.arg(username, senderConnection->peerAddress().toString()));
+
+	for (QClientConnection* client : connectedClients)
+		if (client != senderConnection)
+			client->replicateNewClient(username, computerName);
+}
+
+void QChatlisServer::replicateClientMessage(const QString username, const QString message)
+{
+	QClientConnection* senderConnection{ dynamic_cast<QClientConnection*>(sender()) };
+
+	for (QClientConnection* client : connectedClients)
+		if (client != senderConnection)
+			client->replicateClientMessage(username, message);
+}
+
+void QChatlisServer::clientDisconnected()
+{
+	QClientConnection* disconnectedClient{ dynamic_cast<QClientConnection*>(sender()) };
+
+	QString log("Log : connection closed with client %2");
+	emit serverLog(log.arg(disconnectedClient->peerAddress().toString()));
+
+	connectedClients.removeOne(disconnectedClient);
+	disconnectedClient->deleteLater();
 }
 
 QChatlisServer::~QChatlisServer()
 {
-	for (auto i : connectedClients)
-		delete i;
-}
 
-quint16 QChatlisServer::listeningPort() const
-{
-	return currentListeningPort;
-}
-
-void QChatlisServer::messageReceived(QString message, QClientConnection* sender)
-{
-	emit newOutput("[" + sender->peerName() + "] : " + message);
-	for (auto i : connectedClients)
-		if (i != sender) {
-			i->sendMessage(message, sender);
-			newOutput("Log: sent message to [" + i->peerName() + "]");
-		}
-			
-}
-
-void QChatlisServer::clientDisconnected(QClientConnection* disconnectedClient)
-{
-	emit newOutput("Log : connection closed with client [" + disconnectedClient->peerName() + ']');
-	connectedClients.remove(disconnectedClient->peerName());
-	delete disconnectedClient;
 }

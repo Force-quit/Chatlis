@@ -1,7 +1,7 @@
 #pragma once
 
 #include <QTcpServer>
-#include <QMap>
+#include <QList>
 #include "QClientConnection.h"
 #include <QTcpSocket>
 #include <QString>
@@ -14,17 +14,19 @@ public:
     QChatlisServer(QObject* parent = nullptr);
     ~QChatlisServer();
 
-    quint16 listeningPort() const;
+    const static quint16 PORT_NB;
+
 signals:
-    void newOutput(const QString& message);
+    void serverLog(const QString& message);
+
+protected:
+    void incomingConnection(qintptr socketDescriptor) override;
 
 private slots:
-    void incomingConnection();
-    void messageReceived(QString message, QClientConnection* sender);
-    void clientDisconnected(QClientConnection* disconnectedClient);
+    void clientDisconnected();
+    void replicateClientMessage(const QString username, const QString message);
+    void replicateNewUser(const QString username, const QString computerName);
 
 private:
-    const static quint16 PORT_NB;
-    quint16 currentListeningPort;
-    QMap<QString, QClientConnection*> connectedClients;
+    QList<QClientConnection*> connectedClients;
 };

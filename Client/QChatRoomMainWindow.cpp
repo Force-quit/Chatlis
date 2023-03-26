@@ -15,7 +15,6 @@
 #include <QInputDialog>
 #include <QMessageBox>
 
-#include "../QClient.h"
 
 QChatRoomMainWindow::QChatRoomMainWindow(QWidget *parent)
 	: QMainWindow(parent), chatbox{ new QChatbox }, serverConnection(this)
