@@ -2,6 +2,9 @@
 
 #include <QMainWindow>
 #include "QChatbox.h"
+#include <QMenuBar>
+#include <QMenu>
+#include "QServerConnection.h"
 
 class QChatRoomMainWindow : public QMainWindow
 {
@@ -11,6 +14,14 @@ public:
 	QChatRoomMainWindow(QWidget *parent = nullptr);
 	~QChatRoomMainWindow();
 
+private slots:
+	void tryConnectToServer();
+	void tryChangeUsername();
+
+
 private:
 	QChatbox* chatbox;
+	QServerConnection serverConnection;
+
+	QMenuBar* initMenuBar();
 };
