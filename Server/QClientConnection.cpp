@@ -4,6 +4,7 @@ QClientConnection::QClientConnection(QObject* parent, QTcpSocket* socket)
 	: QObject(parent), socket{ socket }
 {
 	connect(socket, &QTcpSocket::readyRead, this, &QClientConnection::receivedData);
+	connect(socket, &QTcpSocket::disconnected, this, &QClientConnection::clientDisconnected);
 }
 
 void QClientConnection::receivedData()
@@ -11,12 +12,15 @@ void QClientConnection::receivedData()
 	emit messageReceived(socket->readAll());
 }
 
+void QClientConnection::clientDisconnected()
+{
+	emit notifyDisconnect(this);
+}
+
 QClientConnection::~QClientConnection()
 {
-	socket->write("Ok bye now\n");
-	socket->waitForBytesWritten();
 	socket->close();
-	delete socket;
+	socket->deleteLater();
 }
 
 QString QClientConnection::peerName() const
