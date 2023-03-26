@@ -21,6 +21,7 @@ signals:
 private slots:
     void incomingConnection();
     void messageReceived(QString message);
+    void clientDisconnected(QClientConnection* disconnectedClient);
 
 private:
     const static quint16 PORT_NB;

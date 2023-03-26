@@ -21,6 +21,7 @@ void QChatlisServer::incomingConnection()
 	connectedClients.insert(newClient->peerName(), newClient);
 	emit newOutput("Log : connection opened with client [" + newClient->peerName() + ']');
 	connect(newClient, &QClientConnection::messageReceived, this, &QChatlisServer::messageReceived);
+	connect(newClient, &QClientConnection::notifyDisconnect, this, &QChatlisServer::clientDisconnected);
 }
 
 QChatlisServer::~QChatlisServer()
@@ -37,4 +38,11 @@ quint16 QChatlisServer::listeningPort() const
 void QChatlisServer::messageReceived(QString message)
 {
 	emit newOutput(message);
+}
+
+void QChatlisServer::clientDisconnected(QClientConnection* disconnectedClient)
+{
+	emit newOutput("Log : connection closed with client [" + disconnectedClient->peerName() + ']');
+	connectedClients.remove(disconnectedClient->peerName());
+	delete disconnectedClient;
 }
