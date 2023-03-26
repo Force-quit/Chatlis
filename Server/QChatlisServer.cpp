@@ -22,11 +22,18 @@ void QChatlisServer::incomingConnection(qintptr socketDescriptor)
 
 	connect(newClient, &QClientConnection::newClient, this, &QChatlisServer::replicateNewUser);
 	connect(newClient, &QAbstractSocket::disconnected, this, &QChatlisServer::clientDisconnected);
+
+	for (QClientConnection* client : connectedClients)
+		if (client != newClient)
+			newClient->replicateNewClient(client->getClientUsername(), client->getClientComputerName());
 }
 
-void QChatlisServer::replicateNewUser(const QString username, const QString computerName)
+void QChatlisServer::replicateNewUser()
 {
 	QClientConnection* senderConnection{ dynamic_cast<QClientConnection*>(sender()) };
+	const QString& username = senderConnection->getClientUsername();
+	const QString& computerName = senderConnection->getClientComputerName();
+
 
 	QString log("Log : connection opened with client [%1] (%2)");
 	emit serverLog(log.arg(username, senderConnection->peerAddress().toString()));
@@ -36,9 +43,10 @@ void QChatlisServer::replicateNewUser(const QString username, const QString comp
 			client->replicateNewClient(username, computerName);
 }
 
-void QChatlisServer::replicateClientMessage(const QString username, const QString message)
+void QChatlisServer::replicateClientMessage(const QString message)
 {
 	QClientConnection* senderConnection{ dynamic_cast<QClientConnection*>(sender()) };
+	const QString& username = senderConnection->getClientUsername();
 
 	for (QClientConnection* client : connectedClients)
 		if (client != senderConnection)

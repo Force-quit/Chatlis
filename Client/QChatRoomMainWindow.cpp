@@ -14,10 +14,12 @@
 #include <QStringList>
 #include <QInputDialog>
 #include <QMessageBox>
+#include "QServerConnection.h"
 
 
-QChatRoomMainWindow::QChatRoomMainWindow(QWidget *parent)
-	: QMainWindow(parent), chatbox{ new QChatbox }, serverConnection(this)
+
+QChatRoomMainWindow::QChatRoomMainWindow(QWidget* parent)
+	: QMainWindow(parent), serverConnection{ new QServerConnection(this) }
 {
 	QWidget* centralWidget{ new QWidget };
 	QVBoxLayout* centralLayout{ new QVBoxLayout };
@@ -27,6 +29,7 @@ QChatRoomMainWindow::QChatRoomMainWindow(QWidget *parent)
 
 	QSplitter* topLayout{ new QSplitter };
 	topLayout->setChildrenCollapsible(false);
+	QChatbox* chatbox{ new QChatbox(this) };
 	QParticipantsPanel* participantsPanel{ new QParticipantsPanel };
 	topLayout->addWidget(chatbox);
 	topLayout->addWidget(participantsPanel);
@@ -43,8 +46,8 @@ QChatRoomMainWindow::QChatRoomMainWindow(QWidget *parent)
 	setCentralWidget(centralWidget);
 
 	connect(textInput, &QLineEdit::returnPressed, [=]() {chatbox->appendMessage("Emalice", textInput->text()); });
-
 	connect(textInput, &QLineEdit::returnPressed, textInput, &QLineEdit::clear);
+	connect(serverConnection, &QServerConnection::addClientToPanel, participantsPanel, &QParticipantsPanel::addParticipant);
 
 
 	resize(650, 350);
@@ -53,7 +56,6 @@ QChatRoomMainWindow::QChatRoomMainWindow(QWidget *parent)
 	setWindowIcon(QIcon("group-chat.png"));
 }
 
-QChatRoomMainWindow::~QChatRoomMainWindow() {}
 
 
 QMenuBar* QChatRoomMainWindow::initMenuBar()
@@ -83,7 +85,7 @@ void QChatRoomMainWindow::tryConnectToServer()
 	{
 		QStringList ipAndPort = serverAddress.split(':');
 		if (ipAndPort.size() == 2)
-			serverConnection.connectToServer(ipAndPort[0], ipAndPort[1]);
+			serverConnection->connectToServer(ipAndPort[0], ipAndPort[1]);
 		else
 			QMessageBox::critical(this, "Wrong format", "The address and port of the Chatlis server should be in this format : XXX.XXX.XXX.XXX:PPPPP");
 	}
@@ -96,4 +98,9 @@ void QChatRoomMainWindow::tryChangeUsername()
 		tr("New username")));
 	if (!newUsername.isEmpty())
 		serverConnection.connectToServer(newUsername);*/
+}
+
+QChatRoomMainWindow::~QChatRoomMainWindow() 
+{
+	delete serverConnection;
 }

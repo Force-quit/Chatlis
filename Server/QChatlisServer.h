@@ -24,8 +24,8 @@ protected:
 
 private slots:
     void clientDisconnected();
-    void replicateClientMessage(const QString username, const QString message);
-    void replicateNewUser(const QString username, const QString computerName);
+    void replicateClientMessage(const QString message);
+    void replicateNewUser();
 
 private:
     QList<QClientConnection*> connectedClients;
