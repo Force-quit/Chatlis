@@ -2,7 +2,7 @@
 
 #include <QTcpSocket>
 #include <QString>
-#include "../QClient.h"
+#include "../QClientInfo.h"
 
 class QServerConnection  : public QTcpSocket
 {
@@ -14,12 +14,10 @@ public:
 
 	void connectToServer(const QString& address, const QString& portNb);
 
-signals:
-	void writeToOutput(const QString& toWrite);
-
 private slots:
-	void connectedToServer();
+	void shareClientInfo();
+	void receivedData();
 
 private:
-	QClient client;
+	QClientInfo client;
 };

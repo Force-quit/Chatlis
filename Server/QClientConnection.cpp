@@ -1,41 +1,73 @@
 #include "QClientConnection.h"
+#include "../NetworkMessage.h"
+#include <QString>
 
-QClientConnection::QClientConnection(QObject* parent, QTcpSocket* socket)
-	: QObject(parent), socket{ socket }
+
+QClientConnection::QClientConnection(QObject* parent)
+	: QTcpSocket(parent), client()
 {
-	connect(socket, &QTcpSocket::readyRead, this, &QClientConnection::receivedData);
-	connect(socket, &QTcpSocket::disconnected, this, &QClientConnection::clientDisconnected);
+	connect(this, &QIODevice::readyRead, this, &QClientConnection::receivedData);
+}
+
+void QClientConnection::replicateClientMessage(const QString& clientName, const QString& message)
+{
+	QByteArray byteArray;
+	QDataStream dataStream(&byteArray, QIODevice::WriteOnly);
+	dataStream << NetworkMessage::Type::clientSentMessage << clientName << message;
+
+	sendNetworkMessage(byteArray);
+}
+
+void QClientConnection::replicateNewClient(const QString& clientName, const QString& computerName)
+{
+	QByteArray byteArray;
+	QDataStream dataStream(&byteArray, QIODevice::WriteOnly);
+	dataStream << NetworkMessage::Type::clientAdded << clientName << computerName;
+
+	sendNetworkMessage(byteArray);
 }
 
 void QClientConnection::receivedData()
 {
-	emit messageReceived(socket->readAll(), this);
+	QByteArray buffer;
+	QDataStream dataStream(this);
+	dataStream >> buffer;
+	QDataStream processedData(buffer);
+
+	NetworkMessage::Type messageType{};
+	processedData >> messageType;
+
+	QString username;
+	QString computerName;
+	QString clientMessage;
+
+
+	switch (messageType)
+	{
+	case NetworkMessage::Type::invalidType:
+		break;
+	case NetworkMessage::Type::clientRegistration:
+		processedData >> username;
+		processedData >> computerName;
+		emit newClient(username, computerName);
+		break;
+	case NetworkMessage::Type::clientChangeUsername:
+		break;
+	case NetworkMessage::Type::clientChangeComputerName:
+		break;
+	case NetworkMessage::Type::clientSentMessage:
+		processedData >> clientMessage;
+		emit newClientMessage(client.getUsername(), clientMessage);
+		break;
+	default:
+		break;
+	}
 }
 
-void QClientConnection::clientDisconnected()
+void QClientConnection::sendNetworkMessage(const QByteArray& toSend)
 {
-	emit notifyDisconnect(this);
+	QDataStream dataStream(this);
+	dataStream << toSend;
 }
 
-QClientConnection::~QClientConnection()
-{
-	socket->close();
-	socket->deleteLater();
-}
-
-QString QClientConnection::peerName() const
-{
-	return peerAddress();
-}
-
-QString QClientConnection::peerAddress() const
-{
-	return socket->peerAddress().toString();
-}
-
-void QClientConnection::sendMessage(QString message, QClientConnection* sender)
-{
-	QString output = '[' + sender->peerName() + "] : " + message;
-
-	socket->write(output.toUtf8());
-}
+QClientConnection::~QClientConnection() {}
