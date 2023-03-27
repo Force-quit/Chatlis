@@ -27,6 +27,16 @@ void QClientConnection::replicateNewClient(const QString& clientName, const QStr
 	sendNetworkMessage(byteArray);
 }
 
+QString QClientConnection::getClientUsername() const
+{
+	return client.getUsername();
+}
+
+QString QClientConnection::getClientComputerName() const
+{
+	return client.getComputerName();
+}
+
 void QClientConnection::receivedData()
 {
 	QByteArray buffer;
@@ -49,7 +59,9 @@ void QClientConnection::receivedData()
 	case NetworkMessage::Type::clientRegistration:
 		processedData >> username;
 		processedData >> computerName;
-		emit newClient(username, computerName);
+		client.setUsername(username);
+		client.setComputerName(computerName);
+		emit newClient();
 		break;
 	case NetworkMessage::Type::clientChangeUsername:
 		break;
@@ -57,7 +69,7 @@ void QClientConnection::receivedData()
 		break;
 	case NetworkMessage::Type::clientSentMessage:
 		processedData >> clientMessage;
-		emit newClientMessage(client.getUsername(), clientMessage);
+		emit newClientMessage(clientMessage);
 		break;
 	default:
 		break;

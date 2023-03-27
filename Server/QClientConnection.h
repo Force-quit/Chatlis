@@ -14,9 +14,12 @@ public:
 	void replicateClientMessage(const QString& clientName, const QString& message);
 	void replicateNewClient(const QString& clientName, const QString& computerName);
 
+	QString getClientUsername() const;
+	QString getClientComputerName() const;
+
 signals:
-	void newClient(const QString username, const QString computerName);
-	void newClientMessage(const QString clientName, const QString message);
+	void newClient();
+	void newClientMessage(const QString message);
 
 private slots:
 	void receivedData();

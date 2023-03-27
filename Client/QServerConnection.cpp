@@ -46,6 +46,9 @@ void QServerConnection::receivedData()
 	case NetworkMessage::Type::clientSentMessage:
 		break;
 	case NetworkMessage::Type::clientAdded:
+		processedData >> username;
+		processedData >> computerName;
+		emit addClientToPanel(username, computerName);
 		break;
 	default:
 		break;

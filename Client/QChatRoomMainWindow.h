@@ -18,10 +18,8 @@ private slots:
 	void tryConnectToServer();
 	void tryChangeUsername();
 
-
 private:
-	QChatbox* chatbox;
-	QServerConnection serverConnection;
+	QServerConnection* serverConnection;
 
 	QMenuBar* initMenuBar();
 };

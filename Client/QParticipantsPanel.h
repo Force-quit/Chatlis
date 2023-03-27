@@ -13,7 +13,7 @@ public:
 	~QParticipantsPanel();
 
 public slots:
-	void addParticipant(const QString& newParticipant);
+	void addParticipant(const QString participantName, const QString participantComputerName);
 	void removeParticipant(const QString& participantToRemove);
 
 private:
