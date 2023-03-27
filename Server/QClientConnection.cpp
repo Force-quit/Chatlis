@@ -27,12 +27,12 @@ void QClientConnection::replicateNewClient(const QString& clientName, const QStr
 	sendNetworkMessage(byteArray);
 }
 
-const QString& QClientConnection::getClientUsername() const
+QString QClientConnection::getClientUsername() const
 {
 	return client.getUsername();
 }
 
-const QString& QClientConnection::getClientComputerName() const
+QString QClientConnection::getClientComputerName() const
 {
 	return client.getComputerName();
 }
@@ -59,6 +59,8 @@ void QClientConnection::receivedData()
 	case NetworkMessage::Type::clientRegistration:
 		processedData >> username;
 		processedData >> computerName;
+		client.setUsername(username);
+		client.setComputerName(computerName);
 		emit newClient();
 		break;
 	case NetworkMessage::Type::clientChangeUsername:

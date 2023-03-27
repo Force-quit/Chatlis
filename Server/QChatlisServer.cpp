@@ -31,8 +31,8 @@ void QChatlisServer::incomingConnection(qintptr socketDescriptor)
 void QChatlisServer::replicateNewUser()
 {
 	QClientConnection* senderConnection{ dynamic_cast<QClientConnection*>(sender()) };
-	const QString& username = senderConnection->getClientUsername();
-	const QString& computerName = senderConnection->getClientComputerName();
+	const QString username(senderConnection->getClientUsername());
+	const QString computerName(senderConnection->getClientComputerName());
 
 
 	QString log("Log : connection opened with client [%1] (%2)");
@@ -66,5 +66,6 @@ void QChatlisServer::clientDisconnected()
 
 QChatlisServer::~QChatlisServer()
 {
-
+	for (QClientConnection* client : connectedClients)
+		client->abort();
 }

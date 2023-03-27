@@ -14,8 +14,8 @@ public:
 	void replicateClientMessage(const QString& clientName, const QString& message);
 	void replicateNewClient(const QString& clientName, const QString& computerName);
 
-	const QString& getClientUsername() const;
-	const QString& getClientComputerName() const;
+	QString getClientUsername() const;
+	QString getClientComputerName() const;
 
 signals:
 	void newClient();
