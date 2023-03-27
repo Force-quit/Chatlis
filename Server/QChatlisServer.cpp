@@ -21,6 +21,7 @@ void QChatlisServer::incomingConnection(qintptr socketDescriptor)
 	emit newConnection();
 
 	connect(newClient, &QClientConnection::newClient, this, &QChatlisServer::replicateNewUser);
+	connect(newClient, &QClientConnection::newClientMessage, this, &QChatlisServer::replicateClientMessage);
 	connect(newClient, &QAbstractSocket::disconnected, this, &QChatlisServer::clientDisconnected);
 
 	for (QClientConnection* client : connectedClients)

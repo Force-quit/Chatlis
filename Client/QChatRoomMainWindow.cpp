@@ -45,7 +45,9 @@ QChatRoomMainWindow::QChatRoomMainWindow(QWidget* parent)
 	centralWidget->setLayout(centralLayout);
 	setCentralWidget(centralWidget);
 
-	connect(textInput, &QLineEdit::returnPressed, [=]() {chatbox->appendMessage(serverConnection->getUsername(), textInput->text()); });
+	connect(textInput, &QLineEdit::returnPressed, [=]() {chatbox->appendMessage(serverConnection->getUsername(), textInput->text()); 
+		serverConnection->sendNewChatMessage(textInput->text());
+		});
 	connect(textInput, &QLineEdit::returnPressed, textInput, &QLineEdit::clear);
 	connect(serverConnection, &QAbstractSocket::connected, [=]() {
 		chatbox->clearChat(); 

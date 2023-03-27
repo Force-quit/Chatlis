@@ -34,6 +34,15 @@ void QServerConnection::shareClientInfo()
 	dataToSend << buffer;
 }
 
+void QServerConnection::sendNewChatMessage(const QString& message)
+{
+	QByteArray buffer;
+	QDataStream dataStream(&buffer, QIODevice::WriteOnly);
+	dataStream << NetworkMessage::Type::clientSentMessage << client.getUsername() << message;
+	QDataStream dataToSend(this);
+	dataToSend << buffer;
+}
+
 void QServerConnection::receivedData()
 {
 	QByteArray buffer;
