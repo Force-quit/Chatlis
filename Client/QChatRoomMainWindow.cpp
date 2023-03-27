@@ -47,6 +47,7 @@ QChatRoomMainWindow::QChatRoomMainWindow(QWidget* parent)
 
 	connect(textInput, &QLineEdit::returnPressed, [=]() {chatbox->appendMessage("Emalice", textInput->text()); });
 	connect(textInput, &QLineEdit::returnPressed, textInput, &QLineEdit::clear);
+	connect(serverConnection, &QAbstractSocket::connected, [=]() {chatbox->clearChat(); chatbox->appendMessage("Server", "Connected to " + serverConnection->peerAddress().toString()); });
 	connect(serverConnection, &QServerConnection::addClientToPanel, participantsPanel, &QParticipantsPanel::addParticipant);
 
 
