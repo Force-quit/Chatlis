@@ -14,10 +14,10 @@ QParticipantsPanel::QParticipantsPanel(QWidget* parent)
 	setFocusPolicy(Qt::NoFocus);
 }
 
-void QParticipantsPanel::addParticipant(const QString& newParticipant)
+void QParticipantsPanel::addParticipant(const QString participantName, const QString participantComputerName)
 {
 	QStringList currentList{ model->stringList() };
-	currentList.append(newParticipant);
+	currentList.append(participantName + '@' + participantComputerName);
 	model->setStringList(currentList);
 }
 

@@ -24,8 +24,9 @@ void QChatlisServer::incomingConnection(qintptr socketDescriptor)
 	connect(newClient, &QAbstractSocket::disconnected, this, &QChatlisServer::clientDisconnected);
 
 	for (QClientConnection* client : connectedClients)
-		if (client != newClient)
-			newClient->replicateNewClient(client->getClientUsername(), client->getClientComputerName());
+		newClient->replicateNewClient(client->getClientUsername(), client->getClientComputerName());
+
+	connectedClients.append(newClient);
 }
 
 void QChatlisServer::replicateNewUser()
@@ -67,5 +68,5 @@ void QChatlisServer::clientDisconnected()
 QChatlisServer::~QChatlisServer()
 {
 	for (QClientConnection* client : connectedClients)
-		client->abort();
+		disconnect(client, &QAbstractSocket::disconnected, this, &QChatlisServer::clientDisconnected);
 }
