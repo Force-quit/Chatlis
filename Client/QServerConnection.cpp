@@ -11,6 +11,12 @@ QServerConnection::QServerConnection(QObject* parent)
 	connect(this, &QIODevice::readyRead, this, &QServerConnection::receivedData);
 }
 
+QString QServerConnection::getUsername() const
+{
+	return client.getUsername();
+}
+
+
 void QServerConnection::connectToServer(const QString& address, const QString& portNb)
 {
 	QHostAddress temp(address);
@@ -40,10 +46,14 @@ void QServerConnection::receivedData()
 
 	QString username;
 	QString computerName;
+	QString message;
 
 	switch (messageType)
 	{
 	case NetworkMessage::Type::clientSentMessage:
+		processedData >> username;
+		processedData >> message;
+		emit addMessageToChatbox(username, message);
 		break;
 	case NetworkMessage::Type::clientAdded:
 		processedData >> username;
