@@ -16,6 +16,7 @@ public slots:
 	void appendMessage(const QString& from, const QString& message);
 	void participantJoined(const QString& nick);
 	void participantLeft(const QString& nick);
+	void clearChat();
 
 private:
 	static const QColor USER_MIGRATION_TEXT_COLOR;

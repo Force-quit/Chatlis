@@ -45,9 +45,18 @@ QChatRoomMainWindow::QChatRoomMainWindow(QWidget* parent)
 	centralWidget->setLayout(centralLayout);
 	setCentralWidget(centralWidget);
 
-	connect(textInput, &QLineEdit::returnPressed, [=]() {chatbox->appendMessage("Emalice", textInput->text()); });
+	connect(textInput, &QLineEdit::returnPressed, [=]() {chatbox->appendMessage(serverConnection->getUsername(), textInput->text()); 
+		serverConnection->sendNewChatMessage(textInput->text());
+		});
 	connect(textInput, &QLineEdit::returnPressed, textInput, &QLineEdit::clear);
+	connect(serverConnection, &QAbstractSocket::connected, [=]() {
+		chatbox->clearChat(); 
+		chatbox->appendMessage("Server", "Connected to " + serverConnection->peerAddress().toString()); });
 	connect(serverConnection, &QServerConnection::addClientToPanel, participantsPanel, &QParticipantsPanel::addParticipant);
+	connect(participantsPanel, &QParticipantsPanel::addedParticipant, chatbox, &QChatbox::participantJoined);
+	connect(serverConnection, &QServerConnection::removeClientFromPanel, participantsPanel, &QParticipantsPanel::removeParticipant);
+	connect(participantsPanel, &QParticipantsPanel::removedParticipant, chatbox, &QChatbox::participantLeft);
+	connect(serverConnection, &QServerConnection::addMessageToChatbox, chatbox, &QChatbox::appendMessage);
 
 
 	resize(650, 350);

@@ -57,4 +57,9 @@ void QChatbox::appendText(const QString& toAppend)
     append(timeStampedMessage.arg(QDateTime::currentDateTime().toString("hh:mm"), toAppend));
 }
 
+void QChatbox::clearChat()
+{
+    clear();
+}
+
 QChatbox::~QChatbox() {}

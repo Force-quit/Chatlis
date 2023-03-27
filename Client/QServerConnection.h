@@ -12,12 +12,19 @@ public:
 	QServerConnection(QObject *parent);
 	~QServerConnection();
 
+	QString getUsername() const;
+
 	void connectToServer(const QString& address, const QString& portNb);
 
 signals:
+	void addMessageToChatbox(const QString& username, const QString& message);
 	void addClientToPanel(const QString username, const QString computerName);
+	void removeClientFromPanel(const QString username, const QString computerName);
 
-private slots:
+public slots:
+	void sendNewChatMessage(const QString& message);
+
+private slots:	
 	void shareClientInfo();
 	void receivedData();
 

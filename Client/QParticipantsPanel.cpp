@@ -19,13 +19,15 @@ void QParticipantsPanel::addParticipant(const QString participantName, const QSt
 	QStringList currentList{ model->stringList() };
 	currentList.append(participantName + '@' + participantComputerName);
 	model->setStringList(currentList);
+	emit addedParticipant(participantName);
 }
 
-void QParticipantsPanel::removeParticipant(const QString& participantToRemove)
+void QParticipantsPanel::removeParticipant(const QString& participantName, const QString participantComputerName)
 {
 	QStringList currentList{ model->stringList() };
-	currentList.removeOne(participantToRemove);
+	currentList.removeOne(participantName + '@' + participantComputerName);
 	model->setStringList(currentList);
+	emit removedParticipant(participantName);
 }
 
 QParticipantsPanel::~QParticipantsPanel() {}

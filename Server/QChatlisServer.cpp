@@ -21,6 +21,7 @@ void QChatlisServer::incomingConnection(qintptr socketDescriptor)
 	emit newConnection();
 
 	connect(newClient, &QClientConnection::newClient, this, &QChatlisServer::replicateNewUser);
+	connect(newClient, &QClientConnection::newClientMessage, this, &QChatlisServer::replicateClientMessage);
 	connect(newClient, &QAbstractSocket::disconnected, this, &QChatlisServer::clientDisconnected);
 
 	for (QClientConnection* client : connectedClients)
@@ -57,9 +58,15 @@ void QChatlisServer::replicateClientMessage(const QString message)
 void QChatlisServer::clientDisconnected()
 {
 	QClientConnection* disconnectedClient{ dynamic_cast<QClientConnection*>(sender()) };
+	const QString& username = disconnectedClient->getClientUsername();
+	const QString& computerName = disconnectedClient->getClientComputerName();
 
 	QString log("Log : connection closed with client %2");
 	emit serverLog(log.arg(disconnectedClient->peerAddress().toString()));
+
+	for (QClientConnection* client : connectedClients)
+		if (client != disconnectedClient)
+			client->replicateDisconnect(username, computerName);
 
 	connectedClients.removeOne(disconnectedClient);
 }
