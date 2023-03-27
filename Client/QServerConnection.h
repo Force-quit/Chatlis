@@ -16,6 +16,7 @@ public:
 
 signals:
 	void addClientToPanel(const QString username, const QString computerName);
+	void removeClientFromPanel(const QString username, const QString computerName);
 
 private slots:
 	void shareClientInfo();

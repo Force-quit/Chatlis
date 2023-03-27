@@ -27,6 +27,15 @@ void QClientConnection::replicateNewClient(const QString& clientName, const QStr
 	sendNetworkMessage(byteArray);
 }
 
+void QClientConnection::replicateDisconnect(const QString& clientName, const QString& computerName)
+{
+	QByteArray byteArray;
+	QDataStream dataStream(&byteArray, QIODevice::WriteOnly);
+	dataStream << NetworkMessage::Type::clientDisconnected << clientName << computerName;
+
+	sendNetworkMessage(byteArray);
+}
+
 QString QClientConnection::getClientUsername() const
 {
 	return client.getUsername();

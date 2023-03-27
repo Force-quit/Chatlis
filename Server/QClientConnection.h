@@ -13,6 +13,7 @@ public:
 
 	void replicateClientMessage(const QString& clientName, const QString& message);
 	void replicateNewClient(const QString& clientName, const QString& computerName);
+	void replicateDisconnect(const QString& clientName, const QString& computerName);
 
 	QString getClientUsername() const;
 	QString getClientComputerName() const;

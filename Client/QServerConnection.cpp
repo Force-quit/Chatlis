@@ -50,6 +50,11 @@ void QServerConnection::receivedData()
 		processedData >> computerName;
 		emit addClientToPanel(username, computerName);
 		break;
+	case NetworkMessage::Type::clientDisconnected:
+		processedData >> username;
+		processedData >> computerName;
+		emit removeClientFromPanel(username, computerName);
+		break;
 	default:
 		break;
 	}
