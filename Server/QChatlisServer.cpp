@@ -62,7 +62,6 @@ void QChatlisServer::clientDisconnected()
 	emit serverLog(log.arg(disconnectedClient->peerAddress().toString()));
 
 	connectedClients.removeOne(disconnectedClient);
-	disconnectedClient->deleteLater();
 }
 
 QChatlisServer::~QChatlisServer()

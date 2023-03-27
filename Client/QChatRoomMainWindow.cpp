@@ -87,7 +87,7 @@ void QChatRoomMainWindow::tryConnectToServer()
 		if (ipAndPort.size() == 2)
 			serverConnection->connectToServer(ipAndPort[0], ipAndPort[1]);
 		else
-			QMessageBox::critical(this, "Wrong format", "The address and port of the Chatlis server should be in this format : XXX.XXX.XXX.XXX:PPPPP");
+			QMessageBox::critical(this, "Wrong format", "Address and port of Chatlis server should be XXX.XXX.XXX.XXX:PPPPP");
 	}
 }
 
