@@ -18,6 +18,7 @@ public:
 	void sendNewChatMessage(const QString& message);
 
 signals:
+	void clearChatbox();
 	void addMessageToChatbox(const QString username, const QString message);
 	void newClient(const QString username, const QString computerName);
 	void removeClient(const QString username, const QString computerName);

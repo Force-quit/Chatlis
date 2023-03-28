@@ -26,6 +26,7 @@ void QServerConnection::connectToServer(const QString& address, const QString& p
 
 void QServerConnection::shareClientInfo()
 {
+	emit clearChatbox();
 	emit appendSystemMessage("Connected to " + peerAddress().toString());
 
 	QByteArray buffer;

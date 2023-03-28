@@ -49,7 +49,7 @@ void QChatbox::clearChat()
 void QChatbox::appendSystemMessage(const QString message)
 {
     setTextColor(QChatbox::SYSTEM_MESSAGE_TEXT_COLOR);
-    appendTextWithTime(tr("System : %1").arg(message));
+    appendTextWithTime("System : " + message);
     setTextColor(QChatbox::USER_MESSAGE_TEXT_COLOR);
 }
 

@@ -51,7 +51,7 @@ QChatRoomMainWindow::QChatRoomMainWindow(QWidget* parent)
 		textInput->clear();
 	});
 
-	connect(serverConnection, &QAbstractSocket::connected, chatbox, &QChatbox::clearChat);
+	connect(serverConnection, &QServerConnection::clearChatbox, chatbox, &QChatbox::clearChat);
 	connect(serverConnection, &QServerConnection::appendSystemMessage, chatbox, &QChatbox::appendSystemMessage);
 	connect(serverConnection, &QServerConnection::addMessageToChatbox, chatbox, &QChatbox::appendUserMessage);
 	connect(serverConnection, &QServerConnection::appendServerMessage, chatbox, &QChatbox::appendServerMessage);
