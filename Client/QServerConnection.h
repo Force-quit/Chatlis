@@ -3,6 +3,8 @@
 #include <QSslSocket>
 #include <QString>
 #include "../QClientInfo.h"
+#include <QSslKey>
+#include <QSslCertificate>
 
 class QServerConnection  : public QSslSocket
 {
@@ -33,4 +35,6 @@ private slots:
 
 private:
 	QClientInfo client;
+	QSslKey key;
+	QSslCertificate cert;
 };

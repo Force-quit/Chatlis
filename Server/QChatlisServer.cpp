@@ -9,16 +9,19 @@ const quint16 QChatlisServer::PORT_NB{ 59532 };
 QChatlisServer::QChatlisServer(QObject* parent)
 	: QSslServer(parent), connectedClients()
 {
-	QFile keyFile("../SSL/red_local.key");
+	QFile keyFile("../../SSL/red_local.key");
 	keyFile.open(QIODevice::ReadOnly);
 	key = QSslKey(keyFile.readAll(), QSsl::Rsa);
 	keyFile.close();
+	
 
-	QFile certFile("../SSL/red_local.pem");
+	QFile certFile("../../SSL/red_local.pem");
 	certFile.open(QIODevice::ReadOnly);
 	cert = QSslCertificate(certFile.readAll());
 	certFile.close();
-
+	
+	// LOOK AT DOC FOR THIS
+	auto a = sslConfiguration();
 	listen(QHostAddress::Any, QChatlisServer::PORT_NB);
 }
 
