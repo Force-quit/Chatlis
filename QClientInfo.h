@@ -10,6 +10,7 @@ class QClientInfo  : public QObject
 
 public:
 	QClientInfo(QObject *parent = nullptr);
+
 	~QClientInfo();
 
 	QString getUsername() const;

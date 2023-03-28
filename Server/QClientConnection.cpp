@@ -10,11 +10,14 @@ QClientConnection::QClientConnection(QObject* parent)
 	connect(this, &QIODevice::readyRead, this, &QClientConnection::receivedData);
 }
 
-void QClientConnection::replicateExistingClient(const QString& clientName, const QString& computerName)
+void QClientConnection::replicateExistingClients(const QList<QPair<QString, QString>>& existingClients)
 {
 	QByteArray byteArray;
 	QDataStream dataStream(&byteArray, QIODevice::WriteOnly);
-	dataStream << NetworkMessage::Type::replicateExistingClient << clientName << computerName;
+	dataStream << NetworkMessage::Type::replicateExistingClients;
+
+	for (auto& clientInfo : existingClients)
+		dataStream << clientInfo.first << clientInfo.second;
 
 	sendNetworkMessage(byteArray);
 }

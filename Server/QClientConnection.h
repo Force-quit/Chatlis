@@ -11,7 +11,7 @@ public:
 	QClientConnection(QObject* parent);
 	~QClientConnection();
 
-	void replicateExistingClient(const QString& clientName, const QString& computerName);
+	void replicateExistingClients(const QList<QPair<QString, QString>>& existingClients);
 	void replicateClientMessage(const QString& clientName, const QString& message);
 	void replicateNewClient(const QString& clientName, const QString& computerName);
 	void replicateDisconnect(const QString& clientName, const QString& computerName);

@@ -2,7 +2,8 @@
 #include <QtNetwork>
 #include <QTcpSocket>
 #include <QVector>
-
+#include "../QClientInfo.h"
+#include <QPair>
 
 const quint16 QChatlisServer::PORT_NB{ 59532 };
 
@@ -22,9 +23,14 @@ void QChatlisServer::incomingConnection(qintptr socketDescriptor)
 	connect(newClient, &QClientConnection::newClient, this, &QChatlisServer::replicateNewUser);
 	connect(newClient, &QClientConnection::newClientMessage, this, &QChatlisServer::replicateClientMessage);
 	connect(newClient, &QAbstractSocket::disconnected, this, &QChatlisServer::clientDisconnected);
-
-	for (QClientConnection* client : connectedClients)
-		newClient->replicateExistingClient(client->getClientUsername(), client->getClientComputerName());
+	
+	if (connectedClients.size() > 0)
+	{
+		QList<QPair<QString, QString>> existingClients;
+		for (QClientConnection* client : connectedClients)
+			existingClients.push_back(QPair<QString, QString>(client->getClientUsername(), client->getClientComputerName()));
+		newClient->replicateExistingClients(existingClients);
+	}
 
 	connectedClients.append(newClient);
 }

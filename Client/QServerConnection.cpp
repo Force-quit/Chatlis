@@ -68,12 +68,16 @@ void QServerConnection::receivedData()
 		processedData >> message;
 		emit addMessageToChatbox(username, message);
 		break;
+	case NetworkMessage::Type::replicateExistingClients:
+		while (!processedData.atEnd())
+		{
+			processedData >> username;
+			processedData >> computerName;
+			emit newClient(username, computerName);
+		}
+		break;
 	case NetworkMessage::Type::clientAdded:
-	case NetworkMessage::Type::replicateExistingClient:
-		processedData >> username;
-		processedData >> computerName;
-		if (messageType != NetworkMessage::Type::replicateExistingClient)
-			emit appendServerMessage(username + " has joined the server");
+		emit appendServerMessage(username + " has joined the server");
 		emit newClient(username, computerName);
 		break;
 	case NetworkMessage::Type::clientDisconnected:
