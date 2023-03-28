@@ -9,6 +9,7 @@ QServerConnection::QServerConnection(QObject* parent)
 {
 	connect(this, &QAbstractSocket::connected, this, &QServerConnection::shareClientInfo);
 	connect(this, &QIODevice::readyRead, this, &QServerConnection::receivedData);
+	connect(this, &QAbstractSocket::disconnected, this, &QServerConnection::notifyDisconnection);
 }
 
 QString QServerConnection::getUsername() const
@@ -84,6 +85,11 @@ void QServerConnection::receivedData()
 	default:
 		break;
 	}
+}
+
+void QServerConnection::notifyDisconnection()
+{
+	emit appendSystemMessage("Disconnected from server");
 }
 
 QServerConnection::~QServerConnection() 

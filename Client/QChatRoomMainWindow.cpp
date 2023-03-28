@@ -39,15 +39,22 @@ QChatRoomMainWindow::QChatRoomMainWindow(QWidget* parent)
 	QLineEdit* textInput{ new QLineEdit };
 	textInputLayout->addWidget(textInputLabel);
 	textInputLayout->addWidget(textInput);
-	
+
 	centralLayout->addWidget(topLayout);
 	centralLayout->addLayout(textInputLayout);
 	centralWidget->setLayout(centralLayout);
 	setCentralWidget(centralWidget);
 
 	connect(textInput, &QLineEdit::returnPressed, [=]() {
-		chatbox->appendUserMessage(serverConnection->getUsername(), textInput->text()); 
-		serverConnection->sendNewChatMessage(textInput->text());
+		QString currentText(textInput->text().simplified());
+		if (!currentText.isEmpty())
+		{
+			chatbox->appendUserMessage(serverConnection->getUsername(), currentText);
+			serverConnection->sendNewChatMessage(currentText);
+		}
+		else
+			chatbox->appendSystemMessage("Can't send empty messages -_-");
+		
 		textInput->clear();
 	});
 
@@ -109,7 +116,7 @@ void QChatRoomMainWindow::tryChangeUsername()
 		serverConnection.connectToServer(newUsername);*/
 }
 
-QChatRoomMainWindow::~QChatRoomMainWindow() 
+QChatRoomMainWindow::~QChatRoomMainWindow()
 {
 	delete serverConnection;
 }

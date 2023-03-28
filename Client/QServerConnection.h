@@ -28,6 +28,7 @@ signals:
 private slots:	
 	void shareClientInfo();
 	void receivedData();
+	void notifyDisconnection();
 
 private:
 	QClientInfo client;
