@@ -15,6 +15,7 @@
 #include <QInputDialog>
 #include <QMessageBox>
 #include "QServerConnection.h"
+#include "QChatlisMenuBar.h"
 
 
 
@@ -24,7 +25,7 @@ QChatRoomMainWindow::QChatRoomMainWindow(QWidget* parent)
 	QWidget* centralWidget{ new QWidget };
 	QVBoxLayout* centralLayout{ new QVBoxLayout };
 
-	QMenuBar* topMenuBar{ initMenuBar() };
+	QChatlisMenuBar* topMenuBar{ new QChatlisMenuBar(this) };
 	setMenuBar(topMenuBar);
 
 	QSplitter* topLayout{ new QSplitter };
@@ -45,6 +46,8 @@ QChatRoomMainWindow::QChatRoomMainWindow(QWidget* parent)
 	centralWidget->setLayout(centralLayout);
 	setCentralWidget(centralWidget);
 
+	connect(topMenuBar, &QChatlisMenuBar::actionConnectToServer, this, &QChatRoomMainWindow::tryConnectToServer);
+	
 	connect(textInput, &QLineEdit::returnPressed, [=]() {
 		QString currentText(textInput->text().simplified());
 		if (!currentText.isEmpty())
@@ -72,26 +75,6 @@ QChatRoomMainWindow::QChatRoomMainWindow(QWidget* parent)
 	setCentralWidget(centralWidget);
 	setWindowTitle("Chatlis");
 	setWindowIcon(QIcon("group-chat.png"));
-}
-
-
-
-QMenuBar* QChatRoomMainWindow::initMenuBar()
-{
-	QMenuBar* menuBar{ new QMenuBar };
-
-	/*auto* settingsMenu{ new QMenu("Settings") };
-	auto* changeUsernameAction{ new QAction("Change username") };
-	changeUsernameAction->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_R));
-	connect(connectAction, &QAction::triggered, this, &QChatRoomMainWindow::tryConnectToServer);*/
-
-
-	auto* connectAction{ new QAction("Connect to server", menuBar) };
-	connectAction->setShortcut(QKeySequence(Qt::CTRL | Qt::ALT | Qt::Key_C));
-	connect(connectAction, &QAction::triggered, this, &QChatRoomMainWindow::tryConnectToServer);
-	menuBar->addAction(connectAction);
-
-	return menuBar;
 }
 
 void QChatRoomMainWindow::tryConnectToServer()
