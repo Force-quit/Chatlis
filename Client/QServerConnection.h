@@ -24,6 +24,7 @@ signals:
 	void removeClient(const QString username, const QString computerName);
 	void appendSystemMessage(const QString message);
 	void appendServerMessage(const QString message);
+	void serverDisconnected();
 
 private slots:	
 	void shareClientInfo();

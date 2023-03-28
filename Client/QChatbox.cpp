@@ -20,11 +20,12 @@ QChatbox::QChatbox(QWidget *parent)
 
     setFocusPolicy(Qt::NoFocus);
     setReadOnly(true);
-    setTextColor(QChatbox::USER_MESSAGE_TEXT_COLOR);
 }
 
 void QChatbox::appendUserMessage(const QString& from, const QString& message)
 {
+    setTextColor(QChatbox::USER_MESSAGE_TEXT_COLOR);
+
     QScrollBar* bar{ verticalScrollBar() };
     bool scrollBarWasAtBottom{ bar->value() == bar->maximum() };
 
@@ -50,14 +51,12 @@ void QChatbox::appendSystemMessage(const QString message)
 {
     setTextColor(QChatbox::SYSTEM_MESSAGE_TEXT_COLOR);
     appendTextWithTime("System : " + message);
-    setTextColor(QChatbox::USER_MESSAGE_TEXT_COLOR);
 }
 
 void QChatbox::appendServerMessage(const QString message)
 {
     setTextColor(QChatbox::SERVER_MESSAGE_TEXT_COLOR);
     appendTextWithTime("Server : " + message);
-    setTextColor(QChatbox::USER_MESSAGE_TEXT_COLOR);
 }
 
 QChatbox::~QChatbox() {}

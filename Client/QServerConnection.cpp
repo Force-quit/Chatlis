@@ -90,9 +90,10 @@ void QServerConnection::receivedData()
 void QServerConnection::notifyDisconnection()
 {
 	emit appendSystemMessage("Disconnected from server");
+	emit serverDisconnected();
 }
 
 QServerConnection::~QServerConnection() 
 {
-
+	disconnect(this, &QAbstractSocket::disconnected, this, &QServerConnection::notifyDisconnection);
 }

@@ -30,4 +30,9 @@ void QParticipantsPanel::removeParticipant(const QString participantName, const 
 	emit removedParticipant(participantName);
 }
 
+void QParticipantsPanel::clear()
+{
+	model->removeRows(0, model->rowCount());
+}
+
 QParticipantsPanel::~QParticipantsPanel() {}

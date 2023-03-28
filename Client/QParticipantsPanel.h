@@ -19,6 +19,7 @@ signals:
 public slots:
 	void addParticipant(const QString participantName, const QString participantComputerName);
 	void removeParticipant(const QString participantName, const QString participantComputerName);
+	void clear();
 
 private:
 	QStringListModel* model;
