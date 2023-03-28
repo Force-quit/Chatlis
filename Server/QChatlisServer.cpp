@@ -1,6 +1,5 @@
 #include "QChatlisServer.h"
 #include <QtNetwork>
-#include <QTcpSocket>
 #include <QVector>
 #include "../QClientInfo.h"
 #include <QPair>
@@ -8,8 +7,18 @@
 const quint16 QChatlisServer::PORT_NB{ 59532 };
 
 QChatlisServer::QChatlisServer(QObject* parent)
-	: QTcpServer(parent), connectedClients()
+	: QSslServer(parent), connectedClients()
 {
+	QFile keyFile("../SSL/red_local.key");
+	keyFile.open(QIODevice::ReadOnly);
+	key = QSslKey(keyFile.readAll(), QSsl::Rsa);
+	keyFile.close();
+
+	QFile certFile("../SSL/red_local.pem");
+	certFile.open(QIODevice::ReadOnly);
+	cert = QSslCertificate(certFile.readAll());
+	certFile.close();
+
 	listen(QHostAddress::Any, QChatlisServer::PORT_NB);
 }
 
@@ -17,6 +26,9 @@ void QChatlisServer::incomingConnection(qintptr socketDescriptor)
 {
 	QClientConnection* newClient{ new QClientConnection(this) };
 	newClient->setSocketDescriptor(socketDescriptor);
+	newClient->setPrivateKey(key);
+	newClient->setLocalCertificate(cert);
+	newClient->setPeerVerifyMode(QSslSocket::QueryPeer);
 	//addPendingConnection(newClient); No pending connection mechanism?
 	emit newConnection();
 
@@ -24,6 +36,8 @@ void QChatlisServer::incomingConnection(qintptr socketDescriptor)
 	connect(newClient, &QClientConnection::newClientMessage, this, &QChatlisServer::replicateClientMessage);
 	connect(newClient, &QAbstractSocket::disconnected, this, &QChatlisServer::clientDisconnected);
 	
+	newClient->startServerEncryption();
+
 	if (connectedClients.size() > 0)
 	{
 		QList<QPair<QString, QString>> existingClients;
@@ -33,6 +47,7 @@ void QChatlisServer::incomingConnection(qintptr socketDescriptor)
 	}
 
 	connectedClients.append(newClient);
+	
 }
 
 void QChatlisServer::replicateNewUser()

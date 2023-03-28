@@ -4,7 +4,7 @@
 
 
 QClientConnection::QClientConnection(QObject* parent)
-	: QTcpSocket(parent), client()
+	: QSslSocket(parent), client()
 {
 	qDebug("New QClient");
 	connect(this, &QIODevice::readyRead, this, &QClientConnection::receivedData);

@@ -2,12 +2,13 @@
 #include <QHostAddress>
 #include <QDataStream>
 #include <QByteArray>
+#include <QThread>
 #include "../NetworkMessage.h"
 
 QServerConnection::QServerConnection(QObject* parent)
-	: QTcpSocket(parent), client(this)
+	: QSslSocket(parent), client(this)
 {
-	connect(this, &QAbstractSocket::connected, this, &QServerConnection::shareClientInfo);
+	connect(this, &QSslSocket::encrypted, this, &QServerConnection::shareClientInfo);
 	connect(this, &QIODevice::readyRead, this, &QServerConnection::receivedData);
 	connect(this, &QAbstractSocket::disconnected, this, &QServerConnection::notifyDisconnection);
 }
@@ -20,9 +21,10 @@ QString QServerConnection::getUsername() const
 
 void QServerConnection::connectToServer(const QString& address, const QString& portNb)
 {
-	QHostAddress temp(address);
-	if (!temp.isNull())
-		connectToHost(temp, portNb.toUInt());
+	if (!address.isEmpty())
+	{
+		connectToHost(address, portNb.toUInt());
+	}
 }
 
 void QServerConnection::shareClientInfo()

@@ -1,10 +1,10 @@
 #pragma once
 
-#include <QTcpSocket>
+#include <QSslSocket>
 #include <QString>
 #include "../QClientInfo.h"
 
-class QServerConnection  : public QTcpSocket
+class QServerConnection  : public QSslSocket
 {
 	Q_OBJECT
 

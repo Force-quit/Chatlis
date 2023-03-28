@@ -1,9 +1,9 @@
 #pragma once
 
-#include <QTcpSocket>
+#include <QSslSocket>
 #include "../QClientInfo.h"
 
-class QClientConnection : public QTcpSocket
+class QClientConnection : public QSslSocket
 {
 	Q_OBJECT
 

@@ -1,12 +1,13 @@
 #pragma once
 
-#include <QTcpServer>
+#include <QSslServer>
 #include <QList>
 #include "QClientConnection.h"
-#include <QTcpSocket>
 #include <QString>
+#include <QSslKey>
+#include <QSslCertificate>
 
-class QChatlisServer : public QTcpServer
+class QChatlisServer : public QSslServer
 {
     Q_OBJECT
 
@@ -29,4 +30,6 @@ private slots:
 
 private:
     QList<QClientConnection*> connectedClients;
+    QSslKey key;
+    QSslCertificate cert;
 };
