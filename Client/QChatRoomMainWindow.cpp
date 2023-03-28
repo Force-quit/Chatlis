@@ -45,19 +45,19 @@ QChatRoomMainWindow::QChatRoomMainWindow(QWidget* parent)
 	centralWidget->setLayout(centralLayout);
 	setCentralWidget(centralWidget);
 
-	connect(textInput, &QLineEdit::returnPressed, [=]() {chatbox->appendMessage(serverConnection->getUsername(), textInput->text()); 
+	connect(textInput, &QLineEdit::returnPressed, [=]() {
+		chatbox->appendUserMessage(serverConnection->getUsername(), textInput->text()); 
 		serverConnection->sendNewChatMessage(textInput->text());
-		});
-	connect(textInput, &QLineEdit::returnPressed, textInput, &QLineEdit::clear);
-	connect(serverConnection, &QAbstractSocket::connected, [=]() {
-		chatbox->clearChat(); 
-		chatbox->appendMessage("Server", "Connected to " + serverConnection->peerAddress().toString()); });
-	connect(serverConnection, &QServerConnection::addClientToPanel, participantsPanel, &QParticipantsPanel::addParticipant);
-	connect(participantsPanel, &QParticipantsPanel::addedParticipant, chatbox, &QChatbox::participantJoined);
-	connect(serverConnection, &QServerConnection::removeClientFromPanel, participantsPanel, &QParticipantsPanel::removeParticipant);
-	connect(participantsPanel, &QParticipantsPanel::removedParticipant, chatbox, &QChatbox::participantLeft);
-	connect(serverConnection, &QServerConnection::addMessageToChatbox, chatbox, &QChatbox::appendMessage);
+		textInput->clear();
+	});
 
+	connect(serverConnection, &QAbstractSocket::connected, chatbox, &QChatbox::clearChat);
+	connect(serverConnection, &QServerConnection::appendSystemMessage, chatbox, &QChatbox::appendSystemMessage);
+	connect(serverConnection, &QServerConnection::addMessageToChatbox, chatbox, &QChatbox::appendUserMessage);
+	connect(serverConnection, &QServerConnection::appendServerMessage, chatbox, &QChatbox::appendServerMessage);
+
+	connect(serverConnection, &QServerConnection::newClient, participantsPanel, &QParticipantsPanel::addParticipant);
+	connect(serverConnection, &QServerConnection::removeClient, participantsPanel, &QParticipantsPanel::removeParticipant);
 
 	resize(650, 350);
 	setCentralWidget(centralWidget);

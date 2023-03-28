@@ -9,6 +9,15 @@ QClientConnection::QClientConnection(QObject* parent)
 	connect(this, &QIODevice::readyRead, this, &QClientConnection::receivedData);
 }
 
+void QClientConnection::replicateExistingClient(const QString& clientName, const QString& computerName)
+{
+	QByteArray byteArray;
+	QDataStream dataStream(&byteArray, QIODevice::WriteOnly);
+	dataStream << NetworkMessage::Type::replicateExistingClient << clientName << computerName;
+
+	sendNetworkMessage(byteArray);
+}
+
 void QClientConnection::replicateClientMessage(const QString& clientName, const QString& message)
 {
 	QByteArray byteArray;

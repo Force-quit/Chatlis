@@ -25,7 +25,7 @@ void QChatlisServer::incomingConnection(qintptr socketDescriptor)
 	connect(newClient, &QAbstractSocket::disconnected, this, &QChatlisServer::clientDisconnected);
 
 	for (QClientConnection* client : connectedClients)
-		newClient->replicateNewClient(client->getClientUsername(), client->getClientComputerName());
+		newClient->replicateExistingClient(client->getClientUsername(), client->getClientComputerName());
 
 	connectedClients.append(newClient);
 }

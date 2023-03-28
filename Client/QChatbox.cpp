@@ -6,8 +6,10 @@
 #include <QDateTime>
 #include <QSizePolicy>
 
-const QColor QChatbox::USER_MIGRATION_TEXT_COLOR{ Qt::gray };
+const QColor QChatbox::SERVER_MESSAGE_TEXT_COLOR{ Qt::gray };
 const QColor QChatbox::USER_MESSAGE_TEXT_COLOR{ Qt::black };
+const QColor QChatbox::SYSTEM_MESSAGE_TEXT_COLOR{ Qt::red };
+
 
 QChatbox::QChatbox(QWidget *parent)
 	: QTextEdit(parent)
@@ -19,39 +21,21 @@ QChatbox::QChatbox(QWidget *parent)
     setFocusPolicy(Qt::NoFocus);
     setReadOnly(true);
     setTextColor(QChatbox::USER_MESSAGE_TEXT_COLOR);
-
-    participantJoined("Emalice");
-    appendMessage("Emalice", "Yo wassup");
-    participantLeft("Emalice");
 }
 
-void QChatbox::participantJoined(const QString & nick)
-{
-    setTextColor(QChatbox::USER_MIGRATION_TEXT_COLOR);
-    appendText(tr("%1 has joined").arg(nick));
-    setTextColor(QChatbox::USER_MESSAGE_TEXT_COLOR);
-}
-
-void QChatbox::participantLeft(const QString& nick)
-{
-    setTextColor(QChatbox::USER_MIGRATION_TEXT_COLOR);
-    appendText(tr("%1 has left").arg(nick));
-    setTextColor(QChatbox::USER_MESSAGE_TEXT_COLOR);
-}
-
-void QChatbox::appendMessage(const QString& from, const QString& message)
+void QChatbox::appendUserMessage(const QString& from, const QString& message)
 {
     QScrollBar* bar{ verticalScrollBar() };
     bool scrollBarWasAtBottom{ bar->value() == bar->maximum() };
 
     QString toAppend{ "[%1] %2" };
-    appendText(toAppend.arg(from, message));
+    appendTextWithTime(toAppend.arg(from, message));
 
     if (scrollBarWasAtBottom)
         bar->setValue(bar->maximum());
 }
 
-void QChatbox::appendText(const QString& toAppend)
+void QChatbox::appendTextWithTime(const QString& toAppend)
 {
     QString timeStampedMessage{ "%1 %2" };
     append(timeStampedMessage.arg(QDateTime::currentDateTime().toString("hh:mm"), toAppend));
@@ -60,6 +44,20 @@ void QChatbox::appendText(const QString& toAppend)
 void QChatbox::clearChat()
 {
     clear();
+}
+
+void QChatbox::appendSystemMessage(const QString message)
+{
+    setTextColor(QChatbox::SYSTEM_MESSAGE_TEXT_COLOR);
+    appendTextWithTime(tr("System : %1").arg(message));
+    setTextColor(QChatbox::USER_MESSAGE_TEXT_COLOR);
+}
+
+void QChatbox::appendServerMessage(const QString message)
+{
+    setTextColor(QChatbox::SERVER_MESSAGE_TEXT_COLOR);
+    appendTextWithTime("Server : " + message);
+    setTextColor(QChatbox::USER_MESSAGE_TEXT_COLOR);
 }
 
 QChatbox::~QChatbox() {}

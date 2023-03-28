@@ -22,7 +22,7 @@ void QParticipantsPanel::addParticipant(const QString participantName, const QSt
 	emit addedParticipant(participantName);
 }
 
-void QParticipantsPanel::removeParticipant(const QString& participantName, const QString participantComputerName)
+void QParticipantsPanel::removeParticipant(const QString participantName, const QString participantComputerName)
 {
 	QStringList currentList{ model->stringList() };
 	currentList.removeOne(participantName + '@' + participantComputerName);

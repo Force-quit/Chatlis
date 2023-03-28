@@ -26,6 +26,8 @@ void QServerConnection::connectToServer(const QString& address, const QString& p
 
 void QServerConnection::shareClientInfo()
 {
+	emit appendSystemMessage("Connected to " + peerAddress().toString());
+
 	QByteArray buffer;
 	QDataStream dataStream(&buffer, QIODevice::WriteOnly);
 	dataStream << NetworkMessage::Type::clientRegistration << client.getUsername() << client.getComputerName();
@@ -65,18 +67,25 @@ void QServerConnection::receivedData()
 		emit addMessageToChatbox(username, message);
 		break;
 	case NetworkMessage::Type::clientAdded:
+	case NetworkMessage::Type::replicateExistingClient:
 		processedData >> username;
 		processedData >> computerName;
-		emit addClientToPanel(username, computerName);
+		if (messageType != NetworkMessage::Type::replicateExistingClient)
+			emit appendServerMessage(username + " has joined the server");
+		emit newClient(username, computerName);
 		break;
 	case NetworkMessage::Type::clientDisconnected:
 		processedData >> username;
 		processedData >> computerName;
-		emit removeClientFromPanel(username, computerName);
+		emit removeClient(username, computerName);
+		emit appendServerMessage(username + " has left the server");
 		break;
 	default:
 		break;
 	}
 }
 
-QServerConnection::~QServerConnection() {}
+QServerConnection::~QServerConnection() 
+{
+
+}

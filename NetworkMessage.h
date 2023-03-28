@@ -7,6 +7,7 @@ struct NetworkMessage
 		invalidType,
 		clientRegistration,
 		clientAdded,
+		replicateExistingClient,
 		clientDisconnected,
 		clientChangeUsername,
 		clientChangeComputerName,

@@ -12,15 +12,17 @@ public:
 	QChatbox(QWidget *parent = nullptr);
 	~QChatbox();
 
+	void appendUserMessage(const QString& from, const QString& message);
+
 public slots:
-	void appendMessage(const QString& from, const QString& message);
-	void participantJoined(const QString& nick);
-	void participantLeft(const QString& nick);
 	void clearChat();
+	void appendSystemMessage(const QString message);
+	void appendServerMessage(const QString message);
 
 private:
-	static const QColor USER_MIGRATION_TEXT_COLOR;
 	static const QColor USER_MESSAGE_TEXT_COLOR;
+	static const QColor SERVER_MESSAGE_TEXT_COLOR;
+	static const QColor SYSTEM_MESSAGE_TEXT_COLOR;
 
-	void appendText(const QString& toAppend);
+	void appendTextWithTime(const QString& toAppend);
 };
