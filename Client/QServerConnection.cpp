@@ -77,6 +77,8 @@ void QServerConnection::receivedData()
 		}
 		break;
 	case NetworkMessage::Type::clientAdded:
+		processedData >> username;
+		processedData >> computerName;
 		emit appendServerMessage(username + " has joined the server");
 		emit newClient(username, computerName);
 		break;
