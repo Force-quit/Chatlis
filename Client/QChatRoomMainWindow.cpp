@@ -47,7 +47,9 @@ QChatRoomMainWindow::QChatRoomMainWindow(QWidget* parent)
 	setCentralWidget(centralWidget);
 
 	connect(topMenuBar, &QChatlisMenuBar::actionConnectToServer, this, &QChatRoomMainWindow::tryConnectToServer);
-	
+	connect(topMenuBar, &QChatlisMenuBar::actionChangeUsername, this, &QChatRoomMainWindow::tryChangeUsername);
+	connect(topMenuBar, &QChatlisMenuBar::actionChangeComputerName, this, &QChatRoomMainWindow::tryChangeComputerName);
+
 	connect(textInput, &QLineEdit::returnPressed, [=]() {
 		QString currentText(textInput->text().simplified());
 		if (!currentText.isEmpty())
@@ -94,11 +96,32 @@ void QChatRoomMainWindow::tryConnectToServer()
 
 void QChatRoomMainWindow::tryChangeUsername()
 {
-	/*QString newUsername(QInputDialog::getText(this,
-		tr("Change your username"),
-		tr("New username")));
+	QString newUsername(QInputDialog::getText(this,
+		tr("Change username"),
+		tr("Username to display")));
 	if (!newUsername.isEmpty())
-		serverConnection.connectToServer(newUsername);*/
+	{
+		QStringList ipAndPort = newUsername.split(':');
+		if (ipAndPort.size() == 2)
+			serverConnection->connectToServer(ipAndPort[0], ipAndPort[1]);
+		else
+			QMessageBox::critical(this, "Wrong format", "Address and port of Chatlis server should be XXX.XXX.XXX.XXX:PPPPP");
+	}
+}
+
+void QChatRoomMainWindow::tryChangeComputerName()
+{
+	QString serverAddress(QInputDialog::getText(this,
+		tr("Chatlis server connection"),
+		tr("Server address (ip:port)")));
+	if (!serverAddress.isEmpty())
+	{
+		QStringList ipAndPort = serverAddress.split(':');
+		if (ipAndPort.size() == 2)
+			serverConnection->connectToServer(ipAndPort[0], ipAndPort[1]);
+		else
+			QMessageBox::critical(this, "Wrong format", "Address and port of Chatlis server should be XXX.XXX.XXX.XXX:PPPPP");
+	}
 }
 
 QChatRoomMainWindow::~QChatRoomMainWindow()

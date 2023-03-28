@@ -17,6 +17,7 @@ public:
 private slots:
 	void tryConnectToServer();
 	void tryChangeUsername();
+	void tryChangeComputerName();
 
 private:
 	QServerConnection* serverConnection;

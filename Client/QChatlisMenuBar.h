@@ -12,7 +12,9 @@ public:
 
 signals:
 	void actionConnectToServer();
+	void actionChangeUsername();
+	void actionChangeComputerName();
 
 private:
-	
+	QMenu* initUserSettings();
 };
