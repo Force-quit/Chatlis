@@ -6,6 +6,7 @@
 QClientConnection::QClientConnection(QObject* parent)
 	: QTcpSocket(parent), client()
 {
+	qDebug("New QClient");
 	connect(this, &QIODevice::readyRead, this, &QClientConnection::receivedData);
 }
 
@@ -100,4 +101,7 @@ void QClientConnection::sendNetworkMessage(const QByteArray& toSend)
 	dataStream << toSend;
 }
 
-QClientConnection::~QClientConnection() {}
+QClientConnection::~QClientConnection() 
+{
+	qDebug("Delete QClient");
+}

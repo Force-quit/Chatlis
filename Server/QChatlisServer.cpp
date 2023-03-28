@@ -10,14 +10,13 @@ QChatlisServer::QChatlisServer(QObject* parent)
 	: QTcpServer(parent), connectedClients()
 {
 	listen(QHostAddress::Any, QChatlisServer::PORT_NB);
-
 }
 
 void QChatlisServer::incomingConnection(qintptr socketDescriptor)
 {
 	QClientConnection* newClient{ new QClientConnection(this) };
 	newClient->setSocketDescriptor(socketDescriptor);
-	addPendingConnection(newClient);
+	//addPendingConnection(newClient); No pending connection mechanism?
 	emit newConnection();
 
 	connect(newClient, &QClientConnection::newClient, this, &QChatlisServer::replicateNewUser);
@@ -69,10 +68,10 @@ void QChatlisServer::clientDisconnected()
 			client->replicateDisconnect(username, computerName);
 
 	connectedClients.removeOne(disconnectedClient);
+	disconnectedClient->deleteLater();
 }
 
 QChatlisServer::~QChatlisServer()
 {
-	for (QClientConnection* client : connectedClients)
-		disconnect(client, &QAbstractSocket::disconnected, this, &QChatlisServer::clientDisconnected);
+
 }
