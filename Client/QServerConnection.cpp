@@ -4,10 +4,38 @@
 #include <QByteArray>
 #include <QThread>
 #include "../NetworkMessage.h"
+#include <QFile>
+#include <QSslKey>
+#include <QSslCertificate>
+#include <QSslConfiguration>
+#include <QTimer>
 
 QServerConnection::QServerConnection(QObject* parent)
 	: QSslSocket(parent), client(this)
 {
+	QFile keyFile("../../SSL/blue_local.key");
+	keyFile.open(QIODevice::ReadOnly);
+	QSslKey privateKey = QSslKey(keyFile.readAll(), QSsl::Rsa);
+	keyFile.close();
+
+	QFile certFile("../../SSL/blue_local.pem");
+	certFile.open(QIODevice::ReadOnly);
+	QSslCertificate localCert = QSslCertificate(certFile.readAll());
+	certFile.close();
+
+	QFile caFile("../../SSL/red_ca.pem");
+	caFile.open(QIODevice::ReadOnly);
+	QSslCertificate caCert = QSslCertificate(caFile.readAll());
+	caFile.close();
+
+	QSslConfiguration config;
+	config.addCaCertificate(caCert);
+	config.setLocalCertificate(localCert);
+	config.setPeerVerifyMode(QSslSocket::VerifyPeer);
+	config.setPrivateKey(privateKey);
+	config.setProtocol(QSsl::TlsV1_3OrLater);
+	setSslConfiguration(config);
+
 	connect(this, &QSslSocket::encrypted, this, &QServerConnection::shareClientInfo);
 	connect(this, &QIODevice::readyRead, this, &QServerConnection::receivedData);
 	connect(this, &QAbstractSocket::disconnected, this, &QServerConnection::notifyDisconnection);
@@ -22,9 +50,7 @@ QString QServerConnection::getUsername() const
 void QServerConnection::connectToServer(const QString& address, const QString& portNb)
 {
 	if (!address.isEmpty())
-	{
-		connectToHost(address, portNb.toUInt());
-	}
+		connectToHostEncrypted(address, portNb.toUInt());
 }
 
 void QServerConnection::shareClientInfo()

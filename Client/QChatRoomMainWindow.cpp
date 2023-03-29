@@ -48,20 +48,6 @@ QChatRoomMainWindow::QChatRoomMainWindow(QWidget* parent)
 	centralWidget->setLayout(centralLayout);
 	setCentralWidget(centralWidget);
 
-	QFile keyFile("../SSL/blue_local.key");
-	keyFile.open(QIODevice::ReadOnly);
-	QSslKey key = QSslKey(keyFile.readAll(), QSsl::Rsa);
-	keyFile.close();
-
-	QFile certificateFile("../SSL/blue_local.pem");
-	certificateFile.open(QIODevice::ReadOnly);
-	QSslCertificate certificate = QSslCertificate(certificateFile.readAll());
-	certificateFile.close();
-
-	serverConnection->setPrivateKey(key);
-	serverConnection->setLocalCertificate(certificate);
-	serverConnection->setPeerVerifyMode(QSslSocket::QueryPeer);
-
 	connect(textInput, &QLineEdit::returnPressed, [=]() {
 		QString currentText(textInput->text().simplified());
 		if (!currentText.isEmpty())
@@ -90,7 +76,6 @@ QChatRoomMainWindow::QChatRoomMainWindow(QWidget* parent)
 	setWindowTitle("Chatlis");
 	setWindowIcon(QIcon("group-chat.png"));
 }
-
 
 
 QMenuBar* QChatRoomMainWindow::initMenuBar()

@@ -4,8 +4,6 @@
 #include <QList>
 #include "QClientConnection.h"
 #include <QString>
-#include <QSslKey>
-#include <QSslCertificate>
 
 class QChatlisServer : public QSslServer
 {
@@ -27,9 +25,8 @@ private slots:
     void clientDisconnected();
     void replicateClientMessage(const QString message);
     void replicateNewUser();
+    void getNextPendingConnection();
 
 private:
     QList<QClientConnection*> connectedClients;
-    QSslKey key;
-    QSslCertificate cert;
 };

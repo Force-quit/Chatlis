@@ -3,6 +3,10 @@
 #include <QVector>
 #include "../QClientInfo.h"
 #include <QPair>
+#include <QFile>
+#include <QSslKey>
+#include <QSslCertificate>
+#include <QSslConfiguration>
 
 const quint16 QChatlisServer::PORT_NB{ 59532 };
 
@@ -11,17 +15,28 @@ QChatlisServer::QChatlisServer(QObject* parent)
 {
 	QFile keyFile("../../SSL/red_local.key");
 	keyFile.open(QIODevice::ReadOnly);
-	key = QSslKey(keyFile.readAll(), QSsl::Rsa);
+	QSslKey privateKey = QSslKey(keyFile.readAll(), QSsl::Rsa);
 	keyFile.close();
 	
-
 	QFile certFile("../../SSL/red_local.pem");
 	certFile.open(QIODevice::ReadOnly);
-	cert = QSslCertificate(certFile.readAll());
+	QSslCertificate localCert = QSslCertificate(certFile.readAll());
 	certFile.close();
-	
-	// LOOK AT DOC FOR THIS
-	auto a = sslConfiguration();
+
+	QFile caFile("../../SSL/blue_ca.pem");
+	caFile.open(QIODevice::ReadOnly);
+	QSslCertificate caCert = QSslCertificate(caFile.readAll());
+	caFile.close();
+
+	QSslConfiguration config;
+	config.addCaCertificate(caCert);
+	config.setLocalCertificate(localCert);
+	config.setPeerVerifyMode(QSslSocket::VerifyPeer);
+	config.setPrivateKey(privateKey);
+	config.setProtocol(QSsl::TlsV1_3OrLater);
+	setSslConfiguration(config);
+
+	connect(this, &QTcpServer::pendingConnectionAvailable, this, &QChatlisServer::getNextPendingConnection);
 	listen(QHostAddress::Any, QChatlisServer::PORT_NB);
 }
 
@@ -29,28 +44,7 @@ void QChatlisServer::incomingConnection(qintptr socketDescriptor)
 {
 	QClientConnection* newClient{ new QClientConnection(this) };
 	newClient->setSocketDescriptor(socketDescriptor);
-	newClient->setPrivateKey(key);
-	newClient->setLocalCertificate(cert);
-	newClient->setPeerVerifyMode(QSslSocket::QueryPeer);
-	//addPendingConnection(newClient); No pending connection mechanism?
-	emit newConnection();
-
-	connect(newClient, &QClientConnection::newClient, this, &QChatlisServer::replicateNewUser);
-	connect(newClient, &QClientConnection::newClientMessage, this, &QChatlisServer::replicateClientMessage);
-	connect(newClient, &QAbstractSocket::disconnected, this, &QChatlisServer::clientDisconnected);
-	
-	newClient->startServerEncryption();
-
-	if (connectedClients.size() > 0)
-	{
-		QList<QPair<QString, QString>> existingClients;
-		for (QClientConnection* client : connectedClients)
-			existingClients.push_back(QPair<QString, QString>(client->getClientUsername(), client->getClientComputerName()));
-		newClient->replicateExistingClients(existingClients);
-	}
-
-	connectedClients.append(newClient);
-	
+	addPendingConnection(newClient);
 }
 
 void QChatlisServer::replicateNewUser()
@@ -66,6 +60,26 @@ void QChatlisServer::replicateNewUser()
 	for (QClientConnection* client : connectedClients)
 		if (client != senderConnection)
 			client->replicateNewClient(username, computerName);
+}
+
+void QChatlisServer::getNextPendingConnection()
+{
+
+	QClientConnection* newClient{ dynamic_cast<QClientConnection*>(nextPendingConnection()) };
+
+	connect(newClient, &QClientConnection::newClient, this, &QChatlisServer::replicateNewUser);
+	connect(newClient, &QClientConnection::newClientMessage, this, &QChatlisServer::replicateClientMessage);
+	connect(newClient, &QAbstractSocket::disconnected, this, &QChatlisServer::clientDisconnected);
+
+	if (connectedClients.size() > 0)
+	{
+		QList<QPair<QString, QString>> existingClients;
+		for (QClientConnection* client : connectedClients)
+			existingClients.push_back(QPair<QString, QString>(client->getClientUsername(), client->getClientComputerName()));
+		newClient->replicateExistingClients(existingClients);
+	}
+
+	connectedClients.append(newClient);
 }
 
 void QChatlisServer::replicateClientMessage(const QString message)
@@ -95,7 +109,4 @@ void QChatlisServer::clientDisconnected()
 	disconnectedClient->deleteLater();
 }
 
-QChatlisServer::~QChatlisServer()
-{
-
-}
+QChatlisServer::~QChatlisServer() {}
