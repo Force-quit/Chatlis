@@ -13,28 +13,23 @@
 QServerConnection::QServerConnection(QObject* parent)
 	: QSslSocket(parent), client(this)
 {
-	QFile keyFile("../../SSL/blue_local.key");
-	keyFile.open(QIODevice::ReadOnly);
-	QSslKey privateKey = QSslKey(keyFile.readAll(), QSsl::Rsa);
-	keyFile.close();
 
-	QFile certFile("../../SSL/blue_local.pem");
-	certFile.open(QIODevice::ReadOnly);
-	QSslCertificate localCert = QSslCertificate(certFile.readAll());
-	certFile.close();
-
-	QFile caFile("../../SSL/red_ca.pem");
+	QFile caFile("../../SSL/rootCA.pem");
 	caFile.open(QIODevice::ReadOnly);
 	QSslCertificate caCert = QSslCertificate(caFile.readAll());
 	caFile.close();
 
 	QSslConfiguration config;
 	config.addCaCertificate(caCert);
-	config.setLocalCertificate(localCert);
-	config.setPeerVerifyMode(QSslSocket::VerifyPeer);
-	config.setPrivateKey(privateKey);
-	config.setProtocol(QSsl::TlsV1_3OrLater);
 	setSslConfiguration(config);
+
+	//ingore bad hostname
+	QList<QSslError> errorsToIgnore;
+	const QString serverCertPath("../../SSL/client1.pem");
+	auto serverCert = QSslCertificate::fromPath(serverCertPath);
+	Q_ASSERT(!serverCert.isEmpty());
+	errorsToIgnore << QSslError(QSslError::HostNameMismatch, serverCert.at(0));
+	ignoreSslErrors(errorsToIgnore);
 
 	connect(this, &QSslSocket::encrypted, this, &QServerConnection::shareClientInfo);
 	connect(this, &QIODevice::readyRead, this, &QServerConnection::receivedData);

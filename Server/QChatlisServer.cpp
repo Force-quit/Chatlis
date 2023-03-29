@@ -13,37 +13,27 @@ const quint16 QChatlisServer::PORT_NB{ 59532 };
 QChatlisServer::QChatlisServer(QObject* parent)
 	: QSslServer(parent), connectedClients()
 {
-	QFile keyFile("../../SSL/red_local.key");
-	keyFile.open(QIODevice::ReadOnly);
-	QSslKey privateKey = QSslKey(keyFile.readAll(), QSsl::Rsa);
-	keyFile.close();
-	
-	QFile certFile("../../SSL/red_local.pem");
-	certFile.open(QIODevice::ReadOnly);
-	QSslCertificate localCert = QSslCertificate(certFile.readAll());
-	certFile.close();
-
-	QFile caFile("../../SSL/blue_ca.pem");
-	caFile.open(QIODevice::ReadOnly);
-	QSslCertificate caCert = QSslCertificate(caFile.readAll());
-	caFile.close();
-
-	QSslConfiguration config;
-	config.addCaCertificate(caCert);
-	config.setLocalCertificate(localCert);
-	config.setPeerVerifyMode(QSslSocket::VerifyPeer);
-	config.setPrivateKey(privateKey);
-	config.setProtocol(QSsl::TlsV1_3OrLater);
-	setSslConfiguration(config);
-
 	connect(this, &QTcpServer::pendingConnectionAvailable, this, &QChatlisServer::getNextPendingConnection);
 	listen(QHostAddress::Any, QChatlisServer::PORT_NB);
 }
 
 void QChatlisServer::incomingConnection(qintptr socketDescriptor)
 {
+	QFile keyFile("../../SSL/client1.key");
+	keyFile.open(QIODevice::ReadOnly);
+	QSslKey privateKey = QSslKey(keyFile.readAll(), QSsl::Rsa);
+	keyFile.close();
+
+	QFile certFile("../../SSL/client1.pem");
+	certFile.open(QIODevice::ReadOnly);
+	QSslCertificate localCert = QSslCertificate(certFile.readAll());
+	certFile.close();
+
 	QClientConnection* newClient{ new QClientConnection(this) };
 	newClient->setSocketDescriptor(socketDescriptor);
+	newClient->setPrivateKey(privateKey);
+	newClient->setLocalCertificate(localCert);
+	newClient->startServerEncryption();
 	addPendingConnection(newClient);
 }
 
@@ -70,6 +60,7 @@ void QChatlisServer::getNextPendingConnection()
 	connect(newClient, &QClientConnection::newClient, this, &QChatlisServer::replicateNewUser);
 	connect(newClient, &QClientConnection::newClientMessage, this, &QChatlisServer::replicateClientMessage);
 	connect(newClient, &QAbstractSocket::disconnected, this, &QChatlisServer::clientDisconnected);
+	
 
 	if (connectedClients.size() > 0)
 	{

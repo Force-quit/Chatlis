@@ -22,8 +22,7 @@ public:
 signals:
 	void newClient();
 	void newClientMessage(const QString message);
-
-private slots:
+public slots:
 	void receivedData();
 
 private:
