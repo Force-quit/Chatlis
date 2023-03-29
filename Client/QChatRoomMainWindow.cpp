@@ -14,9 +14,6 @@
 #include <QStringList>
 #include <QInputDialog>
 #include <QMessageBox>
-#include <QFile>
-#include <QSslKey>
-#include <QSslCertificate>
 #include "QServerConnection.h"
 #include "QChatlisMenuBar.h"
 
