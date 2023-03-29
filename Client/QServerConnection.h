@@ -28,8 +28,7 @@ signals:
 	void appendServerMessage(const QString message);
 	void serverDisconnected();
 
-private slots:	
-	void shareClientInfo();
+private slots:
 	void receivedData();
 	void notifyDisconnection();
 
