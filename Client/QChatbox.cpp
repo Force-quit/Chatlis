@@ -22,6 +22,24 @@ QChatbox::QChatbox(QWidget *parent)
     setReadOnly(true);
 }
 
+void QChatbox::appendTextWithTime(const QString& toAppend)
+{
+    QString timeStampedMessage{ "%1 %2" };
+    append(timeStampedMessage.arg(QDateTime::currentDateTime().toString("hh:mm"), toAppend));
+}
+
+void QChatbox::appendSystemMessage(const QString message)
+{
+    setTextColor(QChatbox::SYSTEM_MESSAGE_TEXT_COLOR);
+    appendTextWithTime("System : " + message);
+}
+
+void QChatbox::appendServerMessage(const QString message)
+{
+    setTextColor(QChatbox::SERVER_MESSAGE_TEXT_COLOR);
+    appendTextWithTime("Server : " + message);
+}
+
 void QChatbox::appendUserMessage(const QString& from, const QString& message)
 {
     setTextColor(QChatbox::USER_MESSAGE_TEXT_COLOR);
@@ -36,27 +54,9 @@ void QChatbox::appendUserMessage(const QString& from, const QString& message)
         bar->setValue(bar->maximum());
 }
 
-void QChatbox::appendTextWithTime(const QString& toAppend)
-{
-    QString timeStampedMessage{ "%1 %2" };
-    append(timeStampedMessage.arg(QDateTime::currentDateTime().toString("hh:mm"), toAppend));
-}
-
 void QChatbox::clearChat()
 {
     clear();
-}
-
-void QChatbox::appendSystemMessage(const QString message)
-{
-    setTextColor(QChatbox::SYSTEM_MESSAGE_TEXT_COLOR);
-    appendTextWithTime("System : " + message);
-}
-
-void QChatbox::appendServerMessage(const QString message)
-{
-    setTextColor(QChatbox::SERVER_MESSAGE_TEXT_COLOR);
-    appendTextWithTime("Server : " + message);
 }
 
 QChatbox::~QChatbox() {}

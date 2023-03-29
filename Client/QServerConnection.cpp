@@ -2,12 +2,35 @@
 #include <QHostAddress>
 #include <QDataStream>
 #include <QByteArray>
+#include <QThread>
 #include "../NetworkMessage.h"
+#include <QFile>
+#include <QSslKey>
+#include <QSslCertificate>
+#include <QSslConfiguration>
+#include <QTimer>
 
 QServerConnection::QServerConnection(QObject* parent)
-	: QTcpSocket(parent), client(this)
+	: QSslSocket(parent), client(this)
 {
-	connect(this, &QAbstractSocket::connected, this, &QServerConnection::shareClientInfo);
+
+	QFile caFile("../../SSL/rootCA.pem");
+	caFile.open(QIODevice::ReadOnly);
+	QSslCertificate caCert = QSslCertificate(caFile.readAll());
+	caFile.close();
+
+	QSslConfiguration config;
+	config.addCaCertificate(caCert);
+	setSslConfiguration(config);
+
+	//ingore bad hostname
+	QList<QSslError> errorsToIgnore;
+	const QString serverCertPath("../../SSL/client1.pem");
+	auto serverCert = QSslCertificate::fromPath(serverCertPath);
+	Q_ASSERT(!serverCert.isEmpty());
+	errorsToIgnore << QSslError(QSslError::HostNameMismatch, serverCert.at(0));
+	ignoreSslErrors(errorsToIgnore);
+
 	connect(this, &QIODevice::readyRead, this, &QServerConnection::receivedData);
 	connect(this, &QAbstractSocket::disconnected, this, &QServerConnection::notifyDisconnection);
 }
@@ -20,22 +43,29 @@ QString QServerConnection::getUsername() const
 
 void QServerConnection::connectToServer(const QString& address, const QString& portNb)
 {
-	QHostAddress temp(address);
-	if (!temp.isNull())
-		connectToHost(temp, portNb.toUInt());
-}
+	if (!address.isEmpty()) {
+		emit clearChatbox();
+		connectToHostEncrypted(address, portNb.toUInt());
+		if (waitForConnected()) {
+			emit appendSystemMessage("Connected to " + peerAddress().toString());
+			if (waitForEncrypted()) {
+				emit appendSystemMessage("Encrypted connection established");
+				QByteArray buffer;
+				QDataStream dataStream(&buffer, QIODevice::WriteOnly);
+				dataStream << NetworkMessage::Type::clientRegistration << client.getUsername() << client.getComputerName();
 
-void QServerConnection::shareClientInfo()
-{
-	emit clearChatbox();
-	emit appendSystemMessage("Connected to " + peerAddress().toString());
-
-	QByteArray buffer;
-	QDataStream dataStream(&buffer, QIODevice::WriteOnly);
-	dataStream << NetworkMessage::Type::clientRegistration << client.getUsername() << client.getComputerName();
-
-	QDataStream dataToSend(this);
-	dataToSend << buffer;
+				QDataStream dataToSend(this);
+				dataToSend << buffer;
+			}
+			else {
+				emit appendSystemMessage("Encryption failed. Disconnecting");
+				disconnectFromHost();
+			}
+		}
+		else {
+			emit appendSystemMessage("Connection failed");
+		}
+	}
 }
 
 void QServerConnection::sendNewChatMessage(const QString& message)

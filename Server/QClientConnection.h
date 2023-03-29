@@ -1,9 +1,9 @@
 #pragma once
 
-#include <QTcpSocket>
+#include <QSslSocket>
 #include "../QClientInfo.h"
 
-class QClientConnection : public QTcpSocket
+class QClientConnection : public QSslSocket
 {
 	Q_OBJECT
 
@@ -22,8 +22,7 @@ public:
 signals:
 	void newClient();
 	void newClientMessage(const QString message);
-
-private slots:
+public slots:
 	void receivedData();
 
 private:

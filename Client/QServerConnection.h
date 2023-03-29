@@ -1,10 +1,12 @@
 #pragma once
 
-#include <QTcpSocket>
+#include <QSslSocket>
 #include <QString>
 #include "../QClientInfo.h"
+#include <QSslKey>
+#include <QSslCertificate>
 
-class QServerConnection  : public QTcpSocket
+class QServerConnection  : public QSslSocket
 {
 	Q_OBJECT
 
@@ -26,11 +28,12 @@ signals:
 	void appendServerMessage(const QString message);
 	void serverDisconnected();
 
-private slots:	
-	void shareClientInfo();
+private slots:
 	void receivedData();
 	void notifyDisconnection();
 
 private:
 	QClientInfo client;
+	QSslKey key;
+	QSslCertificate cert;
 };

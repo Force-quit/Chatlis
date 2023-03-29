@@ -1,29 +1,52 @@
 #include "QChatlisServer.h"
 #include <QtNetwork>
-#include <QTcpSocket>
 #include <QVector>
 #include "../QClientInfo.h"
 #include <QPair>
+#include <QFile>
+#include <QSslKey>
+#include <QSslCertificate>
+#include <QSslConfiguration>
 
 const quint16 QChatlisServer::PORT_NB{ 59532 };
 
 QChatlisServer::QChatlisServer(QObject* parent)
-	: QTcpServer(parent), connectedClients()
+	: QSslServer(parent), connectedClients()
 {
+	connect(this, &QTcpServer::pendingConnectionAvailable, this, &QChatlisServer::getNextPendingConnection);
 	listen(QHostAddress::Any, QChatlisServer::PORT_NB);
 }
 
 void QChatlisServer::incomingConnection(qintptr socketDescriptor)
 {
+	QFile keyFile("../../SSL/client1.key");
+	keyFile.open(QIODevice::ReadOnly);
+	QSslKey privateKey = QSslKey(keyFile.readAll(), QSsl::Rsa);
+	keyFile.close();
+
+	QFile certFile("../../SSL/client1.pem");
+	certFile.open(QIODevice::ReadOnly);
+	QSslCertificate localCert = QSslCertificate(certFile.readAll());
+	certFile.close();
+
 	QClientConnection* newClient{ new QClientConnection(this) };
 	newClient->setSocketDescriptor(socketDescriptor);
-	//addPendingConnection(newClient); No pending connection mechanism?
-	emit newConnection();
+	newClient->setPrivateKey(privateKey);
+	newClient->setLocalCertificate(localCert);
+	newClient->startServerEncryption();
+	addPendingConnection(newClient);
+}
+
+void QChatlisServer::getNextPendingConnection()
+{
+
+	QClientConnection* newClient{ dynamic_cast<QClientConnection*>(nextPendingConnection()) };
 
 	connect(newClient, &QClientConnection::newClient, this, &QChatlisServer::replicateNewUser);
 	connect(newClient, &QClientConnection::newClientMessage, this, &QChatlisServer::replicateClientMessage);
 	connect(newClient, &QAbstractSocket::disconnected, this, &QChatlisServer::clientDisconnected);
-	
+
+
 	if (connectedClients.size() > 0)
 	{
 		QList<QPair<QString, QString>> existingClients;
@@ -77,7 +100,4 @@ void QChatlisServer::clientDisconnected()
 	disconnectedClient->deleteLater();
 }
 
-QChatlisServer::~QChatlisServer()
-{
-
-}
+QChatlisServer::~QChatlisServer() {}
