@@ -20,6 +20,4 @@ private slots:
 
 private:
 	QServerConnection* serverConnection;
-
-	QMenuBar* initMenuBar();
 };
