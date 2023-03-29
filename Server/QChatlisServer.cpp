@@ -37,6 +37,27 @@ void QChatlisServer::incomingConnection(qintptr socketDescriptor)
 	addPendingConnection(newClient);
 }
 
+void QChatlisServer::getNextPendingConnection()
+{
+
+	QClientConnection* newClient{ dynamic_cast<QClientConnection*>(nextPendingConnection()) };
+
+	connect(newClient, &QClientConnection::newClient, this, &QChatlisServer::replicateNewUser);
+	connect(newClient, &QClientConnection::newClientMessage, this, &QChatlisServer::replicateClientMessage);
+	connect(newClient, &QAbstractSocket::disconnected, this, &QChatlisServer::clientDisconnected);
+
+
+	if (connectedClients.size() > 0)
+	{
+		QList<QPair<QString, QString>> existingClients;
+		for (QClientConnection* client : connectedClients)
+			existingClients.push_back(QPair<QString, QString>(client->getClientUsername(), client->getClientComputerName()));
+		newClient->replicateExistingClients(existingClients);
+	}
+
+	connectedClients.append(newClient);
+}
+
 void QChatlisServer::replicateNewUser()
 {
 	QClientConnection* senderConnection{ dynamic_cast<QClientConnection*>(sender()) };
@@ -50,27 +71,6 @@ void QChatlisServer::replicateNewUser()
 	for (QClientConnection* client : connectedClients)
 		if (client != senderConnection)
 			client->replicateNewClient(username, computerName);
-}
-
-void QChatlisServer::getNextPendingConnection()
-{
-
-	QClientConnection* newClient{ dynamic_cast<QClientConnection*>(nextPendingConnection()) };
-
-	connect(newClient, &QClientConnection::newClient, this, &QChatlisServer::replicateNewUser);
-	connect(newClient, &QClientConnection::newClientMessage, this, &QChatlisServer::replicateClientMessage);
-	connect(newClient, &QAbstractSocket::disconnected, this, &QChatlisServer::clientDisconnected);
-	
-
-	if (connectedClients.size() > 0)
-	{
-		QList<QPair<QString, QString>> existingClients;
-		for (QClientConnection* client : connectedClients)
-			existingClients.push_back(QPair<QString, QString>(client->getClientUsername(), client->getClientComputerName()));
-		newClient->replicateExistingClients(existingClients);
-	}
-
-	connectedClients.append(newClient);
 }
 
 void QChatlisServer::replicateClientMessage(const QString message)
