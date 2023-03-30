@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QListView>
+#include <QStringListModel>
 
 class QParticipantsPanel : public QListView
 {
@@ -10,10 +11,6 @@ public:
 	QParticipantsPanel(QWidget *parent = nullptr);
 	~QParticipantsPanel();
 
-signals:
-	void addedParticipant(const QString participantName);
-	void removedParticipant(const QString participantName);
-
 public slots:
 	void addParticipant(const QString participantName, const QString participantComputerName);
 	void removeParticipant(const QString participantName, const QString participantComputerName);
@@ -22,5 +19,5 @@ public slots:
 	void clear();
 
 private:
-	QStringList* participantsList;
+	QStringListModel* model;
 };
