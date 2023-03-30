@@ -16,6 +16,9 @@ public:
 
 	void connectToServer(const QString& address, const QString& portNb);
 	void sendNewChatMessage(const QString& message);
+	void changeUserName(const QString& newUsername);
+	void changeComputerName(const QString& newComputerName);
+
 
 signals:
 	void clearChatbox();
@@ -25,6 +28,8 @@ signals:
 	void appendSystemMessage(const QString message);
 	void appendServerMessage(const QString message);
 	void serverDisconnected();
+	void otherClientChangedUsername(const QString previousUsername, const QString computerName, const QString newUsername);
+	void otherClientChangedComputerName(const QString username, const QString previousComputerName, const QString newComputerName);
 
 private slots:	
 	void shareClientInfo();

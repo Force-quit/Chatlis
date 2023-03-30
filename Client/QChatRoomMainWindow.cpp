@@ -70,6 +70,9 @@ QChatRoomMainWindow::QChatRoomMainWindow(QWidget* parent)
 
 	connect(serverConnection, &QServerConnection::newClient, participantsPanel, &QParticipantsPanel::addParticipant);
 	connect(serverConnection, &QServerConnection::serverDisconnected, participantsPanel, &QParticipantsPanel::clear);
+	connect(serverConnection, &QServerConnection::otherClientChangedUsername, participantsPanel, &QParticipantsPanel::otherClientChangedUsername);
+	connect(serverConnection, &QServerConnection::otherClientChangedComputerName, participantsPanel, &QParticipantsPanel::otherClientChangedComputerName);
+
 
 	connect(serverConnection, &QServerConnection::removeClient, participantsPanel, &QParticipantsPanel::removeParticipant);
 
@@ -87,7 +90,7 @@ void QChatRoomMainWindow::tryConnectToServer()
 	if (!serverAddress.isEmpty())
 	{
 		QStringList ipAndPort = serverAddress.split(':');
-		if (ipAndPort.size() == 2)
+		if (ipAndPort.size() == 2 && !ipAndPort[0].isEmpty() && !ipAndPort[1].isEmpty())
 			serverConnection->connectToServer(ipAndPort[0], ipAndPort[1]);
 		else
 			QMessageBox::critical(this, "Wrong format", "Address and port of Chatlis server should be XXX.XXX.XXX.XXX:PPPPP");
@@ -100,28 +103,16 @@ void QChatRoomMainWindow::tryChangeUsername()
 		tr("Change username"),
 		tr("Username to display")));
 	if (!newUsername.isEmpty())
-	{
-		QStringList ipAndPort = newUsername.split(':');
-		if (ipAndPort.size() == 2)
-			serverConnection->connectToServer(ipAndPort[0], ipAndPort[1]);
-		else
-			QMessageBox::critical(this, "Wrong format", "Address and port of Chatlis server should be XXX.XXX.XXX.XXX:PPPPP");
-	}
+		serverConnection->changeUserName(newUsername);
 }
 
 void QChatRoomMainWindow::tryChangeComputerName()
 {
-	QString serverAddress(QInputDialog::getText(this,
-		tr("Chatlis server connection"),
-		tr("Server address (ip:port)")));
-	if (!serverAddress.isEmpty())
-	{
-		QStringList ipAndPort = serverAddress.split(':');
-		if (ipAndPort.size() == 2)
-			serverConnection->connectToServer(ipAndPort[0], ipAndPort[1]);
-		else
-			QMessageBox::critical(this, "Wrong format", "Address and port of Chatlis server should be XXX.XXX.XXX.XXX:PPPPP");
-	}
+	QString newComputerName(QInputDialog::getText(this,
+		tr("Change computer name"),
+		tr("Computer name to display")));
+	if (!newComputerName.isEmpty())
+		serverConnection->changeComputerName(newComputerName);
 }
 
 QChatRoomMainWindow::~QChatRoomMainWindow()
