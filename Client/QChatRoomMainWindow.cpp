@@ -45,6 +45,7 @@ QChatRoomMainWindow::QChatRoomMainWindow(QWidget* parent)
 	setCentralWidget(centralWidget);
 
 	connect(topMenuBar, &QChatlisMenuBar::actionConnectToServer, this, &QChatRoomMainWindow::tryConnectToServer);
+	connect(topMenuBar, &QChatlisMenuBar::actionDisconnectFromServer, this, &QChatRoomMainWindow::tryDisconnectFromServer);
 	connect(topMenuBar, &QChatlisMenuBar::actionChangeUsername, this, &QChatRoomMainWindow::tryChangeUsername);
 	connect(topMenuBar, &QChatlisMenuBar::actionChangeComputerName, this, &QChatRoomMainWindow::tryChangeComputerName);
 
@@ -93,6 +94,11 @@ void QChatRoomMainWindow::tryConnectToServer()
 		else
 			QMessageBox::critical(this, "Wrong format", "Address and port of Chatlis server should be XXX.XXX.XXX.XXX:PPPPP");
 	}
+}
+
+void QChatRoomMainWindow::tryDisconnectFromServer()
+{
+	serverConnection->disconnectFromHost();
 }
 
 void QChatRoomMainWindow::tryChangeUsername()
