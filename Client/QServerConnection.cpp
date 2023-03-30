@@ -141,12 +141,14 @@ void QServerConnection::receivedData()
 			processedData >> computerName;
 			processedData >> username;
 			emit otherClientChangedUsername(previousUsername, computerName, username);
+			emit appendServerMessage(previousUsername + '@' + computerName + " changed their name to " + username + '@' + computerName);
 			break;
 		case NetworkMessage::Type::clientChangeComputerName :
 			processedData >> username;
 			processedData >> previousComputerName;
 			processedData >> computerName;
 			emit otherClientChangedComputerName(username, previousComputerName, computerName);
+			emit appendServerMessage(username + '@' + previousComputerName + " changed their name to " + username + '@' + computerName);
 			break;
 		case NetworkMessage::Type::clientDisconnected:
 			processedData >> username;

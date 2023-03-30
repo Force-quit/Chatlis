@@ -1,16 +1,15 @@
 #include "QParticipantsPanel.h"
 #include <QStringList>
 #include <QSizePolicy>
-#include <QStringListModel>
 
 QParticipantsPanel::QParticipantsPanel(QWidget* parent)
-	: QListView(parent), participantsList{ new QStringList }
+	: QListView(parent), model{}
 {
 	QSizePolicy modifiedPolicy{ sizePolicy() };
 	modifiedPolicy.setHorizontalStretch(1);
 	setSizePolicy(modifiedPolicy);
 
-	QStringListModel* model{ new QStringListModel(*participantsList, this) };
+	model = new QStringListModel(this);
 	setModel(model);
 	setEditTriggers(QAbstractItemView::NoEditTriggers);
 	setFocusPolicy(Qt::NoFocus);
@@ -18,17 +17,24 @@ QParticipantsPanel::QParticipantsPanel(QWidget* parent)
 
 void QParticipantsPanel::addParticipant(const QString participantName, const QString participantComputerName)
 {
-	participantsList->append(participantName + '@' + participantComputerName);
+	QStringList participantsList(model->stringList());
+	participantsList.append(participantName + '@' + participantComputerName);
+	model->setStringList(participantsList);
 }
 
 void QParticipantsPanel::removeParticipant(const QString participantName, const QString participantComputerName)
 {
-	participantsList->removeOne(participantName + '@' + participantComputerName);
+	QStringList participantsList(model->stringList());
+
+	participantsList.removeOne(participantName + '@' + participantComputerName);
+	model->setStringList(participantsList);
 }
 
 void QParticipantsPanel::otherClientChangedUsername(const QString previousUsername, const QString computerName, const QString newUsername)
 {
-	for (auto& element : *participantsList)
+	QStringList participantsList(model->stringList());
+
+	for (auto& element : participantsList)
 	{
 		if (element.contains(previousUsername + '@' + computerName))
 		{
@@ -36,11 +42,14 @@ void QParticipantsPanel::otherClientChangedUsername(const QString previousUserna
 			break;
 		}
 	}
+	model->setStringList(participantsList);
 }
 
 void QParticipantsPanel::otherClientChangedComputerName(const QString username, const QString previousComputerName, const QString newComputerName)
 {
-	for (auto& element : *participantsList)
+	QStringList participantsList(model->stringList());
+
+	for (auto& element : participantsList)
 	{
 		if (element.contains(username + '@' + previousComputerName))
 		{
@@ -48,11 +57,14 @@ void QParticipantsPanel::otherClientChangedComputerName(const QString username, 
 			break;
 		}
 	}
+	model->setStringList(participantsList);
 }
 
 void QParticipantsPanel::clear()
 {
-	participantsList->clear();
+	QStringList participantsList(model->stringList());
+	participantsList.clear();
+	model->setStringList(participantsList);
 }
 
 QParticipantsPanel::~QParticipantsPanel() {}
