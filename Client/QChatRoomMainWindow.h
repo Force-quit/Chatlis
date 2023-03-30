@@ -16,6 +16,7 @@ public:
 
 private slots:
 	void tryConnectToServer();
+	void tryDisconnectFromServer();
 	void tryChangeUsername();
 	void tryChangeComputerName();
 
