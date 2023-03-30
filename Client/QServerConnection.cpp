@@ -163,7 +163,6 @@ void QServerConnection::receivedData()
 
 void QServerConnection::notifyDisconnection()
 {
-	emit clearChatbox();
 	emit appendSystemMessage("Disconnected from server");
 	emit serverDisconnected();
 }
