@@ -44,6 +44,9 @@ void QChatlisServer::getNextPendingConnection()
 
 	connect(newClient, &QClientConnection::newClient, this, &QChatlisServer::replicateNewUser);
 	connect(newClient, &QClientConnection::newClientMessage, this, &QChatlisServer::replicateClientMessage);
+	connect(newClient, &QClientConnection::newClientName, this, &QChatlisServer::replicateClientNewUsername);
+	connect(newClient, &QClientConnection::newClientComputerName, this, &QChatlisServer::replicateClientNewComputerName);
+
 	connect(newClient, &QAbstractSocket::disconnected, this, &QChatlisServer::clientDisconnected);
 
 
@@ -71,6 +74,24 @@ void QChatlisServer::replicateNewUser()
 	for (QClientConnection* client : connectedClients)
 		if (client != senderConnection)
 			client->replicateNewClient(username, computerName);
+}
+
+void QChatlisServer::replicateClientNewUsername(const QString previousUsername)
+{
+	QClientConnection* senderConnection{ dynamic_cast<QClientConnection*>(sender()) };
+
+	for (QClientConnection* client : connectedClients)
+		if (client != senderConnection)
+			client->replicateClientNewUsername(previousUsername, senderConnection->getClientComputerName(), senderConnection->getClientUsername());
+}
+
+void QChatlisServer::replicateClientNewComputerName(const QString previousComputerName)
+{
+	QClientConnection* senderConnection{ dynamic_cast<QClientConnection*>(sender()) };
+
+	for (QClientConnection* client : connectedClients)
+		if (client != senderConnection)
+			client->replicateClientNewComputerName(senderConnection->getClientUsername(), previousComputerName, senderConnection->getClientComputerName());
 }
 
 void QChatlisServer::replicateClientMessage(const QString message)

@@ -25,6 +25,8 @@ private slots:
     void clientDisconnected();
     void replicateClientMessage(const QString message);
     void replicateNewUser();
+    void replicateClientNewUsername(const QString previousUsername);
+    void replicateClientNewComputerName(const QString previousComputerName);
     void getNextPendingConnection();
 
 private:

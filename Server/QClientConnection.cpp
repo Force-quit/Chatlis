@@ -49,6 +49,24 @@ void QClientConnection::replicateDisconnect(const QString& clientName, const QSt
 	sendNetworkMessage(byteArray);
 }
 
+void QClientConnection::replicateClientNewUsername(const QString previousUsername, const QString computerName, const QString newUsername)
+{
+	QByteArray byteArray;
+	QDataStream dataStream(&byteArray, QIODevice::WriteOnly);
+	dataStream << NetworkMessage::Type::clientChangeUsername << previousUsername << computerName << newUsername;
+
+	sendNetworkMessage(byteArray);
+}
+
+void QClientConnection::replicateClientNewComputerName(const QString username, const QString previousComputerName, const QString newComputerName)
+{
+	QByteArray byteArray;
+	QDataStream dataStream(&byteArray, QIODevice::WriteOnly);
+	dataStream << NetworkMessage::Type::clientChangeComputerName << username << previousComputerName << newComputerName;
+
+	sendNetworkMessage(byteArray);
+}
+
 QString QClientConnection::getClientUsername() const
 {
 	return client.getUsername();
@@ -86,8 +104,16 @@ void QClientConnection::receivedData()
 		emit newClient();
 		break;
 	case NetworkMessage::Type::clientChangeUsername:
+		QString previousUsername(client.getUsername());
+		processedData >> username;
+		client.setUsername(username);
+		emit newClientName(previousUsername);
 		break;
 	case NetworkMessage::Type::clientChangeComputerName:
+		QString previousComputerName(client.getComputerName());
+		processedData >> computerName;
+		client.setComputerName(computerName);
+		emit newClientComputerName(previousComputerName);
 		break;
 	case NetworkMessage::Type::clientSentMessage:
 		processedData >> clientMessage;

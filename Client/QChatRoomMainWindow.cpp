@@ -47,7 +47,9 @@ QChatRoomMainWindow::QChatRoomMainWindow(QWidget* parent)
 	setCentralWidget(centralWidget);
 
 	connect(topMenuBar, &QChatlisMenuBar::actionConnectToServer, this, &QChatRoomMainWindow::tryConnectToServer);
-	
+	connect(topMenuBar, &QChatlisMenuBar::actionChangeUsername, this, &QChatRoomMainWindow::tryChangeUsername);
+	connect(topMenuBar, &QChatlisMenuBar::actionChangeComputerName, this, &QChatRoomMainWindow::tryChangeComputerName);
+
 	connect(textInput, &QLineEdit::returnPressed, [=]() {
 		QString currentText(textInput->text().simplified());
 		if (!currentText.isEmpty())
@@ -68,6 +70,9 @@ QChatRoomMainWindow::QChatRoomMainWindow(QWidget* parent)
 
 	connect(serverConnection, &QServerConnection::newClient, participantsPanel, &QParticipantsPanel::addParticipant);
 	connect(serverConnection, &QServerConnection::serverDisconnected, participantsPanel, &QParticipantsPanel::clear);
+	connect(serverConnection, &QServerConnection::otherClientChangedUsername, participantsPanel, &QParticipantsPanel::otherClientChangedUsername);
+	connect(serverConnection, &QServerConnection::otherClientChangedComputerName, participantsPanel, &QParticipantsPanel::otherClientChangedComputerName);
+
 
 	connect(serverConnection, &QServerConnection::removeClient, participantsPanel, &QParticipantsPanel::removeParticipant);
 
@@ -85,7 +90,7 @@ void QChatRoomMainWindow::tryConnectToServer()
 	if (!serverAddress.isEmpty())
 	{
 		QStringList ipAndPort = serverAddress.split(':');
-		if (ipAndPort.size() == 2)
+		if (ipAndPort.size() == 2 && !ipAndPort[0].isEmpty() && !ipAndPort[1].isEmpty())
 			serverConnection->connectToServer(ipAndPort[0], ipAndPort[1]);
 		else
 			QMessageBox::critical(this, "Wrong format", "Address and port of Chatlis server should be XXX.XXX.XXX.XXX:PPPPP");
@@ -94,11 +99,20 @@ void QChatRoomMainWindow::tryConnectToServer()
 
 void QChatRoomMainWindow::tryChangeUsername()
 {
-	/*QString newUsername(QInputDialog::getText(this,
-		tr("Change your username"),
-		tr("New username")));
+	QString newUsername(QInputDialog::getText(this,
+		tr("Change username"),
+		tr("Username to display")));
 	if (!newUsername.isEmpty())
-		serverConnection.connectToServer(newUsername);*/
+		serverConnection->changeUserName(newUsername);
+}
+
+void QChatRoomMainWindow::tryChangeComputerName()
+{
+	QString newComputerName(QInputDialog::getText(this,
+		tr("Change computer name"),
+		tr("Computer name to display")));
+	if (!newComputerName.isEmpty())
+		serverConnection->changeComputerName(newComputerName);
 }
 
 QChatRoomMainWindow::~QChatRoomMainWindow()
