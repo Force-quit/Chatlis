@@ -1,12 +1,11 @@
 #pragma once
 
-#include <QTcpServer>
+#include <QSslServer>
 #include <QList>
 #include "QClientConnection.h"
-#include <QTcpSocket>
 #include <QString>
 
-class QChatlisServer : public QTcpServer
+class QChatlisServer : public QSslServer
 {
     Q_OBJECT
 
@@ -28,6 +27,7 @@ private slots:
     void replicateNewUser();
     void replicateClientNewUsername(const QString previousUsername);
     void replicateClientNewComputerName(const QString previousComputerName);
+    void getNextPendingConnection();
 
 private:
     QList<QClientConnection*> connectedClients;

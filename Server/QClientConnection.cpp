@@ -4,10 +4,10 @@
 
 
 QClientConnection::QClientConnection(QObject* parent)
-	: QTcpSocket(parent), client()
+	: QSslSocket(parent), client()
 {
+	connect(this, &QClientConnection::readyRead, this, &QClientConnection::receivedData);
 	qDebug("New QClient");
-	connect(this, &QIODevice::readyRead, this, &QClientConnection::receivedData);
 }
 
 void QClientConnection::replicateExistingClients(const QList<QPair<QString, QString>>& existingClients)

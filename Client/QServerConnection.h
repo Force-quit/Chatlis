@@ -1,10 +1,12 @@
 #pragma once
 
-#include <QTcpSocket>
+#include <QSslSocket>
 #include <QString>
 #include "../QClientInfo.h"
+#include <QSslKey>
+#include <QSslCertificate>
 
-class QServerConnection  : public QTcpSocket
+class QServerConnection  : public QSslSocket
 {
 	Q_OBJECT
 
@@ -31,11 +33,12 @@ signals:
 	void otherClientChangedUsername(const QString previousUsername, const QString computerName, const QString newUsername);
 	void otherClientChangedComputerName(const QString username, const QString previousComputerName, const QString newComputerName);
 
-private slots:	
-	void shareClientInfo();
+private slots:
 	void receivedData();
 	void notifyDisconnection();
 
 private:
 	QClientInfo client;
+	QSslKey key;
+	QSslCertificate cert;
 };
