@@ -19,13 +19,11 @@ QParticipantsPanel::QParticipantsPanel(QWidget* parent)
 void QParticipantsPanel::addParticipant(const QString participantName, const QString participantComputerName)
 {
 	participantsList->append(participantName + '@' + participantComputerName);
-	emit addedParticipant(participantName);
 }
 
 void QParticipantsPanel::removeParticipant(const QString participantName, const QString participantComputerName)
 {
 	participantsList->removeOne(participantName + '@' + participantComputerName);
-	emit removedParticipant(participantName);
 }
 
 void QParticipantsPanel::otherClientChangedUsername(const QString previousUsername, const QString computerName, const QString newUsername)

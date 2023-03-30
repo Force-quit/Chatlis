@@ -79,6 +79,8 @@ void QServerConnection::sendNewChatMessage(const QString& message)
 
 void QServerConnection::changeUserName(const QString& newUsername)
 {
+	client.setUsername(newUsername);
+
 	QByteArray buffer;
 	QDataStream dataStream(&buffer, QIODevice::WriteOnly);
 	dataStream << NetworkMessage::Type::clientChangeUsername << newUsername;
@@ -88,6 +90,8 @@ void QServerConnection::changeUserName(const QString& newUsername)
 
 void QServerConnection::changeComputerName(const QString& newComputerName)
 {
+	client.setComputerName(newComputerName);
+
 	QByteArray buffer;
 	QDataStream dataStream(&buffer, QIODevice::WriteOnly);
 	dataStream << NetworkMessage::Type::clientChangeComputerName << newComputerName;
@@ -136,9 +140,13 @@ void QServerConnection::receivedData()
 			processedData >> previousUsername;
 			processedData >> computerName;
 			processedData >> username;
-
+			emit otherClientChangedUsername(previousUsername, computerName, username);
 			break;
 		case NetworkMessage::Type::clientChangeComputerName :
+			processedData >> username;
+			processedData >> previousComputerName;
+			processedData >> computerName;
+			emit otherClientChangedComputerName(username, previousComputerName, computerName);
 			break;
 		case NetworkMessage::Type::clientDisconnected:
 			processedData >> username;

@@ -17,8 +17,6 @@
 #include "QServerConnection.h"
 #include "QChatlisMenuBar.h"
 
-
-
 QChatRoomMainWindow::QChatRoomMainWindow(QWidget* parent)
 	: QMainWindow(parent), serverConnection{ new QServerConnection(this) }
 {

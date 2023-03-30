@@ -87,6 +87,9 @@ void QClientConnection::receivedData()
 	NetworkMessage::Type messageType{};
 	processedData >> messageType;
 
+	QString previousComputerName(client.getComputerName());
+	QString previousUsername(client.getUsername());
+
 	QString username;
 	QString computerName;
 	QString clientMessage;
@@ -104,13 +107,11 @@ void QClientConnection::receivedData()
 		emit newClient();
 		break;
 	case NetworkMessage::Type::clientChangeUsername:
-		QString previousUsername(client.getUsername());
 		processedData >> username;
 		client.setUsername(username);
 		emit newClientName(previousUsername);
 		break;
 	case NetworkMessage::Type::clientChangeComputerName:
-		QString previousComputerName(client.getComputerName());
 		processedData >> computerName;
 		client.setComputerName(computerName);
 		emit newClientComputerName(previousComputerName);
