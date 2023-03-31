@@ -51,7 +51,7 @@ You should now have these files:
 
 You should now delete the following files for security:
 - rootCA.key
-- server.
+- server.csr
 
 *(they serve no purpose to the applciation)*
 
