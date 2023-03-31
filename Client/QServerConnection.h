@@ -15,6 +15,7 @@ public:
 	~QServerConnection();
 
 	QString getUsername() const;
+	QString getComputerName() const;
 
 	void connectToServer(const QString& address, const QString& portNb);
 	void sendNewChatMessage(const QString& message);
@@ -30,6 +31,8 @@ signals:
 	void appendSystemMessage(const QString message);
 	void appendServerMessage(const QString message);
 	void serverDisconnected();
+	void clientChangedUsername(const QString& newUsername);
+	void clientChangedComputerName(const QString& newComputerName);
 	void otherClientChangedUsername(const QString previousUsername, const QString computerName, const QString newUsername);
 	void otherClientChangedComputerName(const QString username, const QString previousComputerName, const QString newComputerName);
 

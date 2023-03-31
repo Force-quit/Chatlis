@@ -11,11 +11,13 @@ QClientInfo::QClientInfo(QObject *parent)
 void QClientInfo::setUsername(const QString& newName)
 {
     username = newName;
+    emit usernameChanged(newName);
 }
 
 void QClientInfo::setComputerName(const QString& newComputerName)
 {
     computerName = newComputerName;
+    emit computerNameChanged(newComputerName);
 }
 
 QString QClientInfo::getUsername() const

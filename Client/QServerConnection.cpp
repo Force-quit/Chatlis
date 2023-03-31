@@ -33,6 +33,8 @@ QServerConnection::QServerConnection(QObject* parent)
 
 	connect(this, &QIODevice::readyRead, this, &QServerConnection::receivedData);
 	connect(this, &QAbstractSocket::disconnected, this, &QServerConnection::notifyDisconnection);
+	connect(&client, &QClientInfo::usernameChanged, this, &QServerConnection::clientChangedUsername);
+	connect(&client, &QClientInfo::computerNameChanged, this, &QServerConnection::clientChangedComputerName);
 }
 
 QString QServerConnection::getUsername() const
@@ -40,6 +42,10 @@ QString QServerConnection::getUsername() const
 	return client.getUsername();
 }
 
+QString QServerConnection::getComputerName() const
+{
+	return client.getComputerName();
+}
 
 void QServerConnection::connectToServer(const QString& address, const QString& portNb)
 {

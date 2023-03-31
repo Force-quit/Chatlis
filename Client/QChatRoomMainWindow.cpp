@@ -29,9 +29,15 @@ QChatRoomMainWindow::QChatRoomMainWindow(QWidget* parent)
 	QSplitter* topLayout{ new QSplitter };
 	topLayout->setChildrenCollapsible(false);
 	QChatbox* chatbox{ new QChatbox(this) };
+	QWidget* usersWidget{ new QWidget };
+	QVBoxLayout* usersLayout{ new QVBoxLayout };
+	QLabel* userLabel{ new QLabel("Your name: " + serverConnection->getUsername() + '@' + serverConnection->getComputerName()) };
 	QParticipantsPanel* participantsPanel{ new QParticipantsPanel };
+	usersLayout->addWidget(userLabel);
+	usersLayout->addWidget(participantsPanel);
+	usersWidget->setLayout(usersLayout);
 	topLayout->addWidget(chatbox);
-	topLayout->addWidget(participantsPanel);
+	topLayout->addWidget(usersWidget);
 
 	QHBoxLayout* textInputLayout{ new QHBoxLayout };
 	QLabel* textInputLabel{ new QLabel(tr("Message :")) };
@@ -69,6 +75,12 @@ QChatRoomMainWindow::QChatRoomMainWindow(QWidget* parent)
 
 	connect(serverConnection, &QServerConnection::newClient, participantsPanel, &QParticipantsPanel::addParticipant);
 	connect(serverConnection, &QServerConnection::serverDisconnected, participantsPanel, &QParticipantsPanel::clear);
+	connect(serverConnection, &QServerConnection::clientChangedUsername, this, [=](const QString& newUsername) {
+		userLabel->setText("Your name: " + newUsername + '@' + serverConnection->getComputerName());
+	});
+	connect(serverConnection, &QServerConnection::clientChangedComputerName, this, [=](const QString& newComputerName) {
+		userLabel->setText("Your name: " + serverConnection->getUsername() + '@' + newComputerName);
+	});
 	connect(serverConnection, &QServerConnection::otherClientChangedUsername, participantsPanel, &QParticipantsPanel::otherClientChangedUsername);
 	connect(serverConnection, &QServerConnection::otherClientChangedComputerName, participantsPanel, &QParticipantsPanel::otherClientChangedComputerName);
 
