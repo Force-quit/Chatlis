@@ -4,11 +4,11 @@ A chatroom made in C++ with the Qt librairy.
 
 An expanded and updated version of Qt's example project : https://doc.qt.io/qt-6/qtnetwork-network-chat-example.html
 
-## Using Chatlis w/SSL (v1.0.0 and up)
+# Using Chatlis w/SSL (v1.0.0 and up)
 
 The server mainainer needs to generate an SSL certificate that is signed with a CA certificate. 
 
-#### Generate the certificates
+## Generate the certificates
 
 The following example will do 3 things:
 
@@ -24,7 +24,7 @@ openssl req -x509 -new -key rootCA.key -days 3650 -out rootCA.pem \
 -subj '/C=AA/ST=AA/L=AA/O=AA Ltd/OU=AA/CN=AA/emailAddress=aa@aa.com'
 ```
 
-2. Create the server certificate and key pair:
+2. Create the server csr and key pair:
 
 ```sh
 openssl genrsa -out server.key 2048
@@ -39,6 +39,29 @@ openssl x509 -req -days 365 -CA rootCA.pem -CAkey rootCA.key \
 -CAcreateserial -CAserial serial -in server.csr -out server.pem
 ```
 
-#### Use the certifactes
+## Use the certifactes
 
-Coming soon...
+You should now have these files:
+
+- rootCA.key
+- rootCA.pem
+- server.key
+- server.csr
+- server.pem
+
+You should now delete the following files for security:
+- rootCA.key
+- server.
+
+*(they serve no purpose to the applciation)*
+
+### On the server side
+
+You should put `server.key` and `server.pem` in your server's `place-your-certificate-key-pair-here` folder.
+
+### On the client side
+
+Each user wanting to connect to your server should get a copy of **YOUR** `rootCA.pem` file in their client's `place-your-ca-certificates-here` folder.
+
+## You're done
+This should be everything you need to get the server and clients to talk to each other over SSL using a secure protocol! 👍
