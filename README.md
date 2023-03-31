@@ -39,7 +39,7 @@ openssl x509 -req -days 365 -CA rootCA.pem -CAkey rootCA.key \
 -CAcreateserial -CAserial serial -in server.csr -out server.pem
 ```
 
-## Use the certifactes
+## Use the certificates
 
 You should now have these files:
 
