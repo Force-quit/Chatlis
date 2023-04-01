@@ -20,16 +20,14 @@ The following example will do 3 things:
 
 ```sh
 openssl genrsa -out rootCA.key 2048
-openssl req -x509 -new -key rootCA.key -days 3650 -out rootCA.pem \
--subj '/C=AA/ST=AA/L=AA/O=AA Ltd/OU=AA/CN=AA/emailAddress=aa@aa.com'
+openssl req -x509 -new -key rootCA.key -days 365 -out rootCA.pem -subj "/C=AA/ST=AA/L=AA/O=AA Ltd/OU=AA/CN=AA/emailAddress=aa@aa.com"
 ```
 
 2. Create the server csr and key pair:
 
 ```sh
 openssl genrsa -out server.key 2048
-openssl req -new -key server.key -out server.csr \
--subj '/C=BB/ST=BB/L=BB/O=BB Ltd/OU=BB/CN=BB/emailAddress=bb@bb.com'
+openssl req -new -key server.key -out server.csr -subj "/C=BB/ST=BB/L=BB/O=BB Ltd/OU=BB/CN=BB/emailAddress=bb@bb.com"
 ```
 
 3. Generate a signed certificate
