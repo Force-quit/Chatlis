@@ -14,10 +14,6 @@ const QColor QChatbox::SYSTEM_MESSAGE_TEXT_COLOR{ Qt::red };
 QChatbox::QChatbox(QWidget *parent)
 	: QTextEdit(parent)
 {
-    QSizePolicy modifiedPolicy{ sizePolicy() };
-    modifiedPolicy.setHorizontalStretch(4);
-    setSizePolicy(modifiedPolicy);
-
     setFocusPolicy(Qt::NoFocus);
     setReadOnly(true);
 }
@@ -52,11 +48,6 @@ void QChatbox::appendUserMessage(const QString& from, const QString& message)
 
     if (scrollBarWasAtBottom)
         bar->setValue(bar->maximum());
-}
-
-void QChatbox::clearChat()
-{
-    clear();
 }
 
 QChatbox::~QChatbox() {}

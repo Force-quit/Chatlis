@@ -5,10 +5,6 @@
 QParticipantsPanel::QParticipantsPanel(QWidget* parent)
 	: QListView(parent), model{}
 {
-	QSizePolicy modifiedPolicy{ sizePolicy() };
-	modifiedPolicy.setHorizontalStretch(1);
-	setSizePolicy(modifiedPolicy);
-
 	model = new QStringListModel(this);
 	setModel(model);
 	setEditTriggers(QAbstractItemView::NoEditTriggers);

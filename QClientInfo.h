@@ -19,10 +19,6 @@ public:
 	void setUsername(const QString& newName);
 	void setComputerName(const QString& newComputerName);
 
-signals:
-	void usernameChanged(const QString& newUsername);
-	void computerNameChanged(const QString& newComputerName);
-
 private:
 	QString username;
 	QString computerName;

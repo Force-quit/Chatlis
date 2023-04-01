@@ -11,7 +11,7 @@
 #include <QTimer>
 
 QServerConnection::QServerConnection(QObject* parent)
-	: QSslSocket(parent), client(this)
+	: QSslSocket(parent)
 {
 	auto caCerts = QSslCertificate::fromPath("SSL/ca/*.pem", QSsl::Pem, QSslCertificate::PatternSyntax::Wildcard);
 	Q_ASSERT(!caCerts.isEmpty());
@@ -28,37 +28,24 @@ QServerConnection::QServerConnection(QObject* parent)
 
 	connect(this, &QIODevice::readyRead, this, &QServerConnection::receivedData);
 	connect(this, &QAbstractSocket::disconnected, this, &QServerConnection::notifyDisconnection);
-	connect(&client, &QClientInfo::usernameChanged, this, &QServerConnection::clientChangedUsername);
-	connect(&client, &QClientInfo::computerNameChanged, this, &QServerConnection::clientChangedComputerName);
 }
 
-QString QServerConnection::getUsername() const
-{
-	return client.getUsername();
-}
-
-QString QServerConnection::getComputerName() const
-{
-	return client.getComputerName();
-}
-
-void QServerConnection::connectToServer(const QString& address, const QString& portNb)
+void QServerConnection::connectToServer(const QString& address, const QString& portNb, const QString& username, const QString& computerName)
 {
 	if (!address.isEmpty()) 
 	{
-		emit clearChatbox();
 		connectToHostEncrypted(address, portNb.toUInt());
-		emit appendSystemMessage("Connecting to " + address + ':' + portNb + "...");
+		emit appendSystemMessage("Connecting to " + address + ':' + portNb);
 		if (waitForConnected(10000)) 
 		{
 			emit appendSystemMessage("Connected to " + address + ':' + portNb);
-			emit appendSystemMessage("Trying to set up encryption...");
+			emit appendSystemMessage("Trying to set up encryption");
 			if (waitForEncrypted(10000)) 
 			{
 				emit appendSystemMessage("Encrypted connection established");
 				QByteArray buffer;
 				QDataStream dataStream(&buffer, QIODevice::WriteOnly);
-				dataStream << NetworkMessage::Type::clientRegistration << client.getUsername() << client.getComputerName();
+				dataStream << NetworkMessage::Type::clientRegistration << username << computerName;
 
 				QDataStream dataToSend(this);
 				dataToSend << buffer;
@@ -85,8 +72,6 @@ void QServerConnection::sendNewChatMessage(const QString& message)
 
 void QServerConnection::changeUserName(const QString& newUsername)
 {
-	client.setUsername(newUsername);
-
 	QByteArray buffer;
 	QDataStream dataStream(&buffer, QIODevice::WriteOnly);
 	dataStream << NetworkMessage::Type::clientChangeUsername << newUsername;
@@ -96,8 +81,6 @@ void QServerConnection::changeUserName(const QString& newUsername)
 
 void QServerConnection::changeComputerName(const QString& newComputerName)
 {
-	client.setComputerName(newComputerName);
-
 	QByteArray buffer;
 	QDataStream dataStream(&buffer, QIODevice::WriteOnly);
 	dataStream << NetworkMessage::Type::clientChangeComputerName << newComputerName;

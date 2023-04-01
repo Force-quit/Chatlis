@@ -1,10 +1,13 @@
 #pragma once
 
 #include <QMainWindow>
-#include "QChatbox.h"
+#include "QChatWidget.h"
 #include <QMenuBar>
 #include <QMenu>
 #include "QServerConnection.h"
+#include "QParticipantsPanel.h"
+#include <QLabel>
+#include <QVBoxLayout>
 
 class QChatRoomMainWindow : public QMainWindow
 {
@@ -15,11 +18,17 @@ public:
 	~QChatRoomMainWindow();
 
 private slots:
-	void tryConnectToServer();
-	void tryDisconnectFromServer();
-	void tryChangeUsername();
-	void tryChangeComputerName();
+	void actionConnectToServer();
+	void actionDisconnectFromServer();
+	void actionChangeUsername();
+	void actionChangeComputerName();
 
 private:
+	QClientInfo client;
+
 	QServerConnection* serverConnection;
+	QLabel* userDisplayName;
+	QParticipantsPanel* participantsPanel;
+	QChatWidget* chatWidget;
+	QWidget* initParticipantsWidget();
 };

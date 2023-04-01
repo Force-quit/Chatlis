@@ -12,10 +12,8 @@ public:
 	QChatbox(QWidget *parent = nullptr);
 	~QChatbox();
 
-	void appendUserMessage(const QString& from, const QString& message);
-
 public slots:
-	void clearChat();
+	void appendUserMessage(const QString& from, const QString& message);
 	void appendSystemMessage(const QString message);
 	void appendServerMessage(const QString message);
 
