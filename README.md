@@ -8,6 +8,10 @@ An expanded and updated version of Qt's example project : https://doc.qt.io/qt-6
 
 The server mainainer needs to generate an SSL certificate that is signed with a CA certificate. 
 
+## Port-Forwarding
+
+To enable internet communication, you need to port-forward TCP over port 59532.
+
 ## Installing OpenSSL Command Prompt on Windows
 
 Run the following command in an elevated powershell window:
