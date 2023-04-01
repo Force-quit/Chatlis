@@ -49,8 +49,8 @@ void QChatlisServer::replicateNewUser()
 
 
 	QString log("Log : connection opened with client [%1] (%2)");
-	QHostAddress temp(senderConnection->peerAddress().toIPv4Address());
-	emit serverLog(log.arg(username, temp.toString()));
+	QHostAddress formated(senderConnection->peerAddress().toIPv4Address());
+	emit serverLog(log.arg(username, formated.toString()));
 
 	for (QClientConnection* client : connectedClients)
 		if (client != senderConnection)
@@ -92,7 +92,8 @@ void QChatlisServer::clientDisconnected()
 	const QString& computerName = disconnectedClient->getClientComputerName();
 
 	QString log("Log : connection closed with client [%1] (%2)");
-	emit serverLog(log.arg(username, disconnectedClient->peerAddress().toString()));
+	QHostAddress formated(disconnectedClient->peerAddress().toIPv4Address());
+	emit serverLog(log.arg(username, formated.toString()));
 
 	for (QClientConnection* client : connectedClients)
 		if (client != disconnectedClient)
