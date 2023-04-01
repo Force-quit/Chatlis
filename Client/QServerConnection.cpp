@@ -13,7 +13,6 @@
 QServerConnection::QServerConnection(QObject* parent)
 	: QSslSocket(parent), client(this)
 {
-
 	QFile caFile("../../SSL/rootCA.pem");
 	caFile.open(QIODevice::ReadOnly);
 	QSslCertificate caCert = QSslCertificate(caFile.readAll());
@@ -23,11 +22,9 @@ QServerConnection::QServerConnection(QObject* parent)
 	config.addCaCertificate(caCert);
 	setSslConfiguration(config);
 
-	//ingore bad hostname
-	QList<QSslError> errorsToIgnore;
-	const QString serverCertPath("../../SSL/client1.pem");
-	auto serverCert = QSslCertificate::fromPath(serverCertPath);
+	auto serverCert = QSslCertificate::fromPath("../../SSL/client1.pem");
 	Q_ASSERT(!serverCert.isEmpty());
+	QList<QSslError> errorsToIgnore;
 	errorsToIgnore << QSslError(QSslError::HostNameMismatch, serverCert.at(0));
 	ignoreSslErrors(errorsToIgnore);
 
@@ -49,12 +46,15 @@ QString QServerConnection::getComputerName() const
 
 void QServerConnection::connectToServer(const QString& address, const QString& portNb)
 {
-	if (!address.isEmpty()) {
+	if (!address.isEmpty()) 
+	{
 		emit clearChatbox();
 		connectToHostEncrypted(address, portNb.toUInt());
-		if (waitForConnected()) {
+		if (waitForConnected()) 
+		{
 			emit appendSystemMessage("Connected to " + peerAddress().toString());
-			if (waitForEncrypted()) {
+			if (waitForEncrypted()) 
+			{
 				emit appendSystemMessage("Encrypted connection established");
 				QByteArray buffer;
 				QDataStream dataStream(&buffer, QIODevice::WriteOnly);
@@ -63,14 +63,14 @@ void QServerConnection::connectToServer(const QString& address, const QString& p
 				QDataStream dataToSend(this);
 				dataToSend << buffer;
 			}
-			else {
+			else 
+			{
 				emit appendSystemMessage("Encryption failed. Disconnecting");
 				disconnectFromHost();
 			}
 		}
-		else {
+		else 
 			emit appendSystemMessage("Connection failed");
-		}
 	}
 }
 
