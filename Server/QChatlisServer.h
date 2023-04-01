@@ -10,7 +10,7 @@ class QChatlisServer : public QSslServer
     Q_OBJECT
 
 public:
-    QChatlisServer(QObject* parent = nullptr);
+    QChatlisServer();
     ~QChatlisServer();
 
     const static quint16 PORT_NB;

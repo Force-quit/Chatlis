@@ -8,7 +8,7 @@ class QClientConnection : public QSslSocket
 	Q_OBJECT
 
 public:
-	QClientConnection(QObject* parent);
+	QClientConnection(QObject* parent, qintptr socketDescriptor);
 	~QClientConnection();
 
 	void replicateExistingClients(const QList<QPair<QString, QString>>& existingClients);

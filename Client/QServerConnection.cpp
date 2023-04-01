@@ -11,66 +11,59 @@
 #include <QTimer>
 
 QServerConnection::QServerConnection(QObject* parent)
-	: QSslSocket(parent), client(this)
+	: QSslSocket(parent)
 {
-
-	QFile caFile("../../SSL/rootCA.pem");
-	caFile.open(QIODevice::ReadOnly);
-	QSslCertificate caCert = QSslCertificate(caFile.readAll());
-	caFile.close();
-
+	auto caCerts = QSslCertificate::fromPath("SSL/ca/*.pem", QSsl::Pem, QSslCertificate::PatternSyntax::Wildcard);
+	Q_ASSERT(!caCerts.isEmpty());
 	QSslConfiguration config;
-	config.addCaCertificate(caCert);
+	config.setCaCertificates(caCerts);
 	setSslConfiguration(config);
 
-	//ingore bad hostname
+	auto serverCerts = QSslCertificate::fromPath("SSL/public/*.pem", QSsl::Pem, QSslCertificate::PatternSyntax::Wildcard);
+	Q_ASSERT(!serverCerts.isEmpty());
 	QList<QSslError> errorsToIgnore;
-	const QString serverCertPath("../../SSL/client1.pem");
-	auto serverCert = QSslCertificate::fromPath(serverCertPath);
-	Q_ASSERT(!serverCert.isEmpty());
-	errorsToIgnore << QSslError(QSslError::HostNameMismatch, serverCert.at(0));
+	for (const auto& cert : serverCerts)
+		errorsToIgnore << QSslError(QSslError::HostNameMismatch, cert);
 	ignoreSslErrors(errorsToIgnore);
 
 	connect(this, &QIODevice::readyRead, this, &QServerConnection::receivedData);
 	connect(this, &QAbstractSocket::disconnected, this, &QServerConnection::notifyDisconnection);
-	connect(&client, &QClientInfo::usernameChanged, this, &QServerConnection::clientChangedUsername);
-	connect(&client, &QClientInfo::computerNameChanged, this, &QServerConnection::clientChangedComputerName);
 }
 
-QString QServerConnection::getUsername() const
+void QServerConnection::connectToServer(const QString& address, const QString& portNb, const QString& username, const QString& computerName)
 {
-	return client.getUsername();
-}
+	if (isEncrypted())
+	{
+		disconnectFromHost();
+		waitForDisconnected(5000);
+	}
 
-QString QServerConnection::getComputerName() const
-{
-	return client.getComputerName();
-}
-
-void QServerConnection::connectToServer(const QString& address, const QString& portNb)
-{
-	if (!address.isEmpty()) {
-		emit clearChatbox();
+	if (!address.isEmpty()) 
+	{
 		connectToHostEncrypted(address, portNb.toUInt());
-		if (waitForConnected()) {
-			emit appendSystemMessage("Connected to " + peerAddress().toString());
-			if (waitForEncrypted()) {
+		emit appendSystemMessage("Connecting to " + address + ':' + portNb);
+		if (waitForConnected(10000)) 
+		{
+			emit appendSystemMessage("Connected to " + address + ':' + portNb);
+			emit appendSystemMessage("Trying to set up encryption");
+			if (waitForEncrypted(10000)) 
+			{
 				emit appendSystemMessage("Encrypted connection established");
 				QByteArray buffer;
 				QDataStream dataStream(&buffer, QIODevice::WriteOnly);
-				dataStream << NetworkMessage::Type::clientRegistration << client.getUsername() << client.getComputerName();
+				dataStream << NetworkMessage::Type::clientRegistration << username << computerName;
 
 				QDataStream dataToSend(this);
 				dataToSend << buffer;
 			}
-			else {
+			else 
+			{
 				emit appendSystemMessage("Encryption failed. Disconnecting");
 				disconnectFromHost();
 			}
 		}
-		else {
+		else 
 			emit appendSystemMessage("Connection failed");
-		}
 	}
 }
 
@@ -85,8 +78,6 @@ void QServerConnection::sendNewChatMessage(const QString& message)
 
 void QServerConnection::changeUserName(const QString& newUsername)
 {
-	client.setUsername(newUsername);
-
 	QByteArray buffer;
 	QDataStream dataStream(&buffer, QIODevice::WriteOnly);
 	dataStream << NetworkMessage::Type::clientChangeUsername << newUsername;
@@ -96,8 +87,6 @@ void QServerConnection::changeUserName(const QString& newUsername)
 
 void QServerConnection::changeComputerName(const QString& newComputerName)
 {
-	client.setComputerName(newComputerName);
-
 	QByteArray buffer;
 	QDataStream dataStream(&buffer, QIODevice::WriteOnly);
 	dataStream << NetworkMessage::Type::clientChangeComputerName << newComputerName;

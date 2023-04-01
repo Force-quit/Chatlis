@@ -2,6 +2,8 @@
 
 #include <QMainWindow>
 #include "QChatlisServer.h"
+#include <QGroupBox>
+#include <QTextEdit>
 
 class QServerMainWindow : public QMainWindow
 {
@@ -13,4 +15,7 @@ public:
 
 private:
 	QChatlisServer* server;
+	QTextEdit* output;
+
+	QGroupBox* initOutputGroupBox();
 };

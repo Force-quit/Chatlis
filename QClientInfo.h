@@ -9,7 +9,7 @@ class QClientInfo  : public QObject
 	Q_OBJECT
 
 public:
-	QClientInfo(QObject *parent = nullptr);
+	QClientInfo(bool isLocalClient);
 
 	~QClientInfo();
 
@@ -18,10 +18,6 @@ public:
 
 	void setUsername(const QString& newName);
 	void setComputerName(const QString& newComputerName);
-
-signals:
-	void usernameChanged(const QString& newUsername);
-	void computerNameChanged(const QString& newComputerName);
 
 private:
 	QString username;

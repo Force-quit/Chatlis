@@ -1,13 +1,29 @@
 #include "QClientConnection.h"
 #include "../NetworkMessage.h"
 #include <QString>
+#include <QFile>
+#include <QSslKey>
+#include <QSslCertificate>
 
-
-QClientConnection::QClientConnection(QObject* parent)
-	: QSslSocket(parent), client()
+QClientConnection::QClientConnection(QObject* parent, qintptr socketDescriptor)
+	: QSslSocket(parent), client(false)
 {
+	QFile keyFile("SSL/server.key");
+	keyFile.open(QIODevice::ReadOnly);
+	QSslKey privateKey = QSslKey(keyFile.readAll(), QSsl::Rsa);
+	keyFile.close();
+
+	QFile certFile("SSL/server.pem");
+	certFile.open(QIODevice::ReadOnly);
+	QSslCertificate localCert = QSslCertificate(certFile.readAll());
+	certFile.close();
+
+	setPrivateKey(privateKey);
+	setLocalCertificate(localCert);
+	setSocketDescriptor(socketDescriptor);
+	startServerEncryption();
+
 	connect(this, &QClientConnection::readyRead, this, &QClientConnection::receivedData);
-	qDebug("New QClient");
 }
 
 void QClientConnection::replicateExistingClients(const QList<QPair<QString, QString>>& existingClients)
