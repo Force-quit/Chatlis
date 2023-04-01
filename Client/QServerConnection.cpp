@@ -32,6 +32,12 @@ QServerConnection::QServerConnection(QObject* parent)
 
 void QServerConnection::connectToServer(const QString& address, const QString& portNb, const QString& username, const QString& computerName)
 {
+	if (isEncrypted())
+	{
+		disconnectFromHost();
+		waitForDisconnected(5000);
+	}
+
 	if (!address.isEmpty()) 
 	{
 		connectToHostEncrypted(address, portNb.toUInt());

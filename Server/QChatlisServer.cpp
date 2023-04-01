@@ -49,7 +49,8 @@ void QChatlisServer::replicateNewUser()
 
 
 	QString log("Log : connection opened with client [%1] (%2)");
-	emit serverLog(log.arg(username, senderConnection->peerAddress().toString()));
+	QHostAddress temp(senderConnection->peerAddress().toIPv4Address());
+	emit serverLog(log.arg(username, temp.toString()));
 
 	for (QClientConnection* client : connectedClients)
 		if (client != senderConnection)
