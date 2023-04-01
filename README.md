@@ -30,7 +30,7 @@ The following example will do 3 things:
 - Generate a Csr+Key pair that will be used by the server to negotiate SSL connections with clients.
 - Generate a signed certificate using the Csr and the CA certificate to allow clients to validate the server's identity.
 
-1. Ceate the CA certificate:
+1. Create the CA certificate:
 
 ```sh
 openssl genrsa -out rootCA.key 2048
