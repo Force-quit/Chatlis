@@ -48,10 +48,12 @@ void QServerConnection::connectToServer(const QString& address, const QString& p
 	{
 		emit clearChatbox();
 		connectToHostEncrypted(address, portNb.toUInt());
-		if (waitForConnected()) 
+		emit appendSystemMessage("Connecting to " + address + ':' + portNb + "...");
+		if (waitForConnected(10000)) 
 		{
-			emit appendSystemMessage("Connected to " + peerAddress().toString());
-			if (waitForEncrypted()) 
+			emit appendSystemMessage("Connected to " + address + ':' + portNb);
+			emit appendSystemMessage("Trying to set up encryption...");
+			if (waitForEncrypted(10000)) 
 			{
 				emit appendSystemMessage("Encrypted connection established");
 				QByteArray buffer;
