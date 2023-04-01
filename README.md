@@ -61,6 +61,7 @@ You should now have these files:
 - server.pem
 
 You should now delete the following files for security:
+- serial
 - rootCA.key
 - server.csr
 
