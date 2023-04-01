@@ -14,6 +14,7 @@
 #include <QStringList>
 #include <QInputDialog>
 #include <QMessageBox>
+#include <QGroupBox>
 #include "QServerConnection.h"
 #include "QChatlisMenuBar.h"
 
@@ -31,10 +32,18 @@ QChatRoomMainWindow::QChatRoomMainWindow(QWidget* parent)
 	QChatbox* chatbox{ new QChatbox(this) };
 	QWidget* usersWidget{ new QWidget };
 	QVBoxLayout* usersLayout{ new QVBoxLayout };
-	QLabel* userLabel{ new QLabel("Your name: " + serverConnection->getUsername() + '@' + serverConnection->getComputerName()) };
+	QGroupBox* user{new QGroupBox("Your name") };
+	QVBoxLayout* userLayout{ new QVBoxLayout };
+	QLabel* userLabel{ new QLabel(serverConnection->getUsername() + '@' + serverConnection->getComputerName()) };
+	userLayout->addWidget(userLabel);
+	user->setLayout(userLayout);
+	QGroupBox* participants{ new QGroupBox("Participants") };
+	QVBoxLayout* participantsLayout{ new QVBoxLayout };
 	QParticipantsPanel* participantsPanel{ new QParticipantsPanel };
-	usersLayout->addWidget(userLabel);
-	usersLayout->addWidget(participantsPanel);
+	participantsLayout->addWidget(participantsPanel);
+	participants->setLayout(participantsLayout);
+	usersLayout->addWidget(user);
+	usersLayout->addWidget(participants);
 	usersWidget->setLayout(usersLayout);
 	topLayout->addWidget(chatbox);
 	topLayout->addWidget(usersWidget);
@@ -76,10 +85,10 @@ QChatRoomMainWindow::QChatRoomMainWindow(QWidget* parent)
 	connect(serverConnection, &QServerConnection::newClient, participantsPanel, &QParticipantsPanel::addParticipant);
 	connect(serverConnection, &QServerConnection::serverDisconnected, participantsPanel, &QParticipantsPanel::clear);
 	connect(serverConnection, &QServerConnection::clientChangedUsername, this, [=](const QString& newUsername) {
-		userLabel->setText("Your name: " + newUsername + '@' + serverConnection->getComputerName());
+		userLabel->setText(newUsername + '@' + serverConnection->getComputerName());
 	});
 	connect(serverConnection, &QServerConnection::clientChangedComputerName, this, [=](const QString& newComputerName) {
-		userLabel->setText("Your name: " + serverConnection->getUsername() + '@' + newComputerName);
+		userLabel->setText(serverConnection->getUsername() + '@' + newComputerName);
 	});
 	connect(serverConnection, &QServerConnection::otherClientChangedUsername, participantsPanel, &QParticipantsPanel::otherClientChangedUsername);
 	connect(serverConnection, &QServerConnection::otherClientChangedComputerName, participantsPanel, &QParticipantsPanel::otherClientChangedComputerName);
