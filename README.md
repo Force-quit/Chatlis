@@ -8,6 +8,16 @@ An expanded and updated version of Qt's example project : https://doc.qt.io/qt-6
 
 The server mainainer needs to generate an SSL certificate that is signed with a CA certificate. 
 
+## Installing OpenSSL Command Prompt on Windows
+
+Run the following command in an elevated powershell window:
+
+```sh
+winget install openssl
+```
+
+Then search for and run Win64 OpenSSL Command Prompt to enter the commands specified in the next step.
+
 ## Generate the certificates
 
 The following example will do 3 things:
