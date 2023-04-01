@@ -57,11 +57,16 @@ You should now delete the following files for security:
 
 ### On the server side
 
-You should put `server.key` and `server.pem` in your server's `place-your-certificate-key-pair-here` folder.
+You should put `server.key` and `server.pem` in your server's `SSL` folder.
 
 ### On the client side
 
-Each user wanting to connect to your server should get a copy of **YOUR** `rootCA.pem` file in their client's `place-your-ca-certificates-here` folder.
+Each user wanting to connect to your server should get a copy of:
+
+- Your `rootCA.pem` file in their client's `SSL/ca/` folder.
+- Your `server.pem` file in their client's `SSL/public/` folder.
+
+> Note: you should rename the copies of `rootCA.pem` and `server.pem` to memorable names when handing them out to users in case they have multiple certificates to deal with.
 
 ## You're done
 This should be everything you need to get the server and clients to talk to each other over SSL using a secure protocol! 👍

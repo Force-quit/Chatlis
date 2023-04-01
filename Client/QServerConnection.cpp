@@ -13,19 +13,17 @@
 QServerConnection::QServerConnection(QObject* parent)
 	: QSslSocket(parent), client(this)
 {
-	QFile caFile("../../SSL/rootCA.pem");
-	caFile.open(QIODevice::ReadOnly);
-	QSslCertificate caCert = QSslCertificate(caFile.readAll());
-	caFile.close();
-
+	auto caCerts = QSslCertificate::fromPath("SSL/ca/*.pem", QSsl::Pem, QSslCertificate::PatternSyntax::Wildcard);
+	Q_ASSERT(!caCerts.isEmpty());
 	QSslConfiguration config;
-	config.addCaCertificate(caCert);
+	config.setCaCertificates(caCerts);
 	setSslConfiguration(config);
 
-	auto serverCert = QSslCertificate::fromPath("../../SSL/client1.pem");
-	Q_ASSERT(!serverCert.isEmpty());
+	auto serverCerts = QSslCertificate::fromPath("SSL/public/*.pem", QSsl::Pem, QSslCertificate::PatternSyntax::Wildcard);
+	Q_ASSERT(!serverCerts.isEmpty());
 	QList<QSslError> errorsToIgnore;
-	errorsToIgnore << QSslError(QSslError::HostNameMismatch, serverCert.at(0));
+	for (const auto& cert : serverCerts)
+		errorsToIgnore << QSslError(QSslError::HostNameMismatch, cert);
 	ignoreSslErrors(errorsToIgnore);
 
 	connect(this, &QIODevice::readyRead, this, &QServerConnection::receivedData);
