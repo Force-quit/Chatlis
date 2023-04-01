@@ -47,8 +47,7 @@ openssl req -new -key server.key -out server.csr -subj "/C=BB/ST=BB/L=BB/O=BB Lt
 3. Generate a signed certificate
 
 ```sh
-openssl x509 -req -days 365 -CA rootCA.pem -CAkey rootCA.key \
--CAcreateserial -CAserial serial -in server.csr -out server.pem
+openssl x509 -req -days 365 -CA rootCA.pem -CAkey rootCA.key -CAcreateserial -CAserial serial -in server.csr -out server.pem
 ```
 
 ## Use the certificates
