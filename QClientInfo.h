@@ -9,7 +9,7 @@ class QClientInfo  : public QObject
 	Q_OBJECT
 
 public:
-	QClientInfo(QObject *parent = nullptr);
+	QClientInfo(bool isLocalClient);
 
 	~QClientInfo();
 

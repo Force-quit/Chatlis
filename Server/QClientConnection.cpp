@@ -6,14 +6,14 @@
 #include <QSslCertificate>
 
 QClientConnection::QClientConnection(QObject* parent, qintptr socketDescriptor)
-	: QSslSocket(parent), client()
+	: QSslSocket(parent), client(false)
 {
-	QFile keyFile("SSL/client1.key");
+	QFile keyFile("SSL/server.key");
 	keyFile.open(QIODevice::ReadOnly);
 	QSslKey privateKey = QSslKey(keyFile.readAll(), QSsl::Rsa);
 	keyFile.close();
 
-	QFile certFile("SSL/client1.pem");
+	QFile certFile("SSL/server.pem");
 	certFile.open(QIODevice::ReadOnly);
 	QSslCertificate localCert = QSslCertificate(certFile.readAll());
 	certFile.close();

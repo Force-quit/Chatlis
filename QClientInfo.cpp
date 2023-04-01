@@ -1,11 +1,15 @@
 #include "QClientInfo.h"
 
-QClientInfo::QClientInfo(QObject *parent)
-	: QObject(parent), computerName(qEnvironmentVariable("USERDOMAIN")),
-    username(qEnvironmentVariable("USERNAME"))
+QClientInfo::QClientInfo(bool isLocalClient)
+	: computerName(), username()
 {
-    if (username.isEmpty())
-        username = qEnvironmentVariable("USER");
+    if (isLocalClient)
+    {
+        computerName = qEnvironmentVariable("USERDOMAIN");
+        username = qEnvironmentVariable("USERNAME");
+        if (username.isEmpty())
+            username = qEnvironmentVariable("USER");
+    }
 }
 
 void QClientInfo::setUsername(const QString& newName)

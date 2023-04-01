@@ -20,7 +20,7 @@
 #include "QChatWidget.h"
 
 QChatRoomMainWindow::QChatRoomMainWindow(QWidget* parent)
-	: QMainWindow(parent), serverConnection{ new QServerConnection(this) }, 
+	: QMainWindow(parent), client(true), serverConnection{ new QServerConnection(this) }, 
 	userDisplayName{}, participantsPanel{}, chatWidget{ new QChatWidget(this, client) }
 {
 	QChatlisMenuBar* topMenuBar{ new QChatlisMenuBar(this) };
@@ -82,9 +82,14 @@ void QChatRoomMainWindow::actionChangeUsername()
 	QString newUsername(QInputDialog::getText(this,	tr("Change username"), tr("Username to display")));
 	if (!newUsername.isEmpty())
 	{
-		client.setUsername(newUsername);
-		serverConnection->changeUserName(newUsername);
-		userDisplayName->setText(newUsername + '@' + client.getComputerName());
+		if (newUsername.size() > 20)
+			QMessageBox::critical(this, "Username too long", "Displayed username can't be longer than 20");
+		else
+		{
+			client.setUsername(newUsername);
+			serverConnection->changeUserName(newUsername);
+			userDisplayName->setText(newUsername + '@' + client.getComputerName());
+		}
 	}
 }
 
@@ -93,9 +98,14 @@ void QChatRoomMainWindow::actionChangeComputerName()
 	QString newComputerName(QInputDialog::getText(this, tr("Change computer name"), tr("Computer name to display")));
 	if (!newComputerName.isEmpty())
 	{
-		client.setComputerName(newComputerName);
-		serverConnection->changeComputerName(newComputerName);
-		userDisplayName->setText(client.getUsername() + '@' + newComputerName);
+		if (newComputerName.size() > 20)
+			QMessageBox::critical(this, "Computer name too long", "Displayed computer name can't be longer than 20");
+		else
+		{
+			client.setComputerName(newComputerName);
+			serverConnection->changeComputerName(newComputerName);
+			userDisplayName->setText(client.getUsername() + '@' + newComputerName);
+		}
 	}
 }
 
