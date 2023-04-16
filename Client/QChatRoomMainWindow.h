@@ -8,6 +8,7 @@
 #include "QParticipantsPanel.h"
 #include <QLabel>
 #include <QVBoxLayout>
+#include <memory>
 
 class QChatRoomMainWindow : public QMainWindow
 {
@@ -26,7 +27,8 @@ private slots:
 private:
 	QClientInfo client;
 
-	QServerConnection* serverConnection;
+	std::unique_ptr<QServerConnection> serverConnection;
+
 	QLabel* userDisplayName;
 	QParticipantsPanel* participantsPanel;
 	QChatWidget* chatWidget;
