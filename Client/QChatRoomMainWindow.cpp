@@ -20,7 +20,7 @@
 #include "QChatWidget.h"
 
 QChatRoomMainWindow::QChatRoomMainWindow(QWidget* parent)
-	: QMainWindow(parent), client(true), serverConnection{ new QServerConnection(this) }, 
+	: QMainWindow(parent), client(true), serverConnection(std::make_unique<QServerConnection>(this)),
 	userDisplayName{}, participantsPanel{}, chatWidget{ new QChatWidget(this, client) }
 {
 	QChatlisMenuBar* topMenuBar{ new QChatlisMenuBar(this) };
@@ -42,23 +42,22 @@ QChatRoomMainWindow::QChatRoomMainWindow(QWidget* parent)
 	connect(topMenuBar, &QChatlisMenuBar::actionChangeUsername, this, &QChatRoomMainWindow::actionChangeUsername);
 	connect(topMenuBar, &QChatlisMenuBar::actionChangeComputerName, this, &QChatRoomMainWindow::actionChangeComputerName);
 
-	connect(serverConnection, &QServerConnection::appendSystemMessage, chatWidget, &QChatWidget::appendSystemMessage);
-	connect(serverConnection, &QServerConnection::addMessageToChatbox, chatWidget, &QChatWidget::appendUserMessage);
-	connect(serverConnection, &QServerConnection::appendServerMessage, chatWidget, &QChatWidget::appendServerMessage);
-	connect(chatWidget, &QChatWidget::sendMessage, serverConnection, &QServerConnection::sendNewChatMessage);
+	connect(serverConnection.get(), &QServerConnection::appendSystemMessage, chatWidget, &QChatWidget::appendSystemMessage);
+	connect(serverConnection.get(), &QServerConnection::addMessageToChatbox, chatWidget, &QChatWidget::appendUserMessage);
+	connect(serverConnection.get(), &QServerConnection::appendServerMessage, chatWidget, &QChatWidget::appendServerMessage);
+	connect(chatWidget, &QChatWidget::sendMessage, serverConnection.get(), &QServerConnection::sendNewChatMessage);
 
 
-	connect(serverConnection, &QServerConnection::newClient, participantsPanel, &QParticipantsPanel::addParticipant);
-	connect(serverConnection, &QServerConnection::serverDisconnected, participantsPanel, &QParticipantsPanel::clear);
-	connect(serverConnection, &QServerConnection::otherClientChangedUsername, participantsPanel, &QParticipantsPanel::otherClientChangedUsername);
-	connect(serverConnection, &QServerConnection::otherClientChangedComputerName, participantsPanel, &QParticipantsPanel::otherClientChangedComputerName);
-	connect(serverConnection, &QServerConnection::removeClient, participantsPanel, &QParticipantsPanel::removeParticipant);
-
+	connect(serverConnection.get(), &QServerConnection::newClient, participantsPanel, &QParticipantsPanel::addParticipant);
+	connect(serverConnection.get(), &QServerConnection::serverDisconnected, participantsPanel, &QParticipantsPanel::clear);
+	connect(serverConnection.get(), &QServerConnection::otherClientChangedUsername, participantsPanel, &QParticipantsPanel::otherClientChangedUsername);
+	connect(serverConnection.get(), &QServerConnection::otherClientChangedComputerName, participantsPanel, &QParticipantsPanel::otherClientChangedComputerName);
+	connect(serverConnection.get(), &QServerConnection::removeClient, participantsPanel, &QParticipantsPanel::removeParticipant);
 }
 
 void QChatRoomMainWindow::actionConnectToServer()
 {
-	QString serverAddress(QInputDialog::getText(this, tr("Chatlis server connection"),	tr("Server address (ip:port)")));
+	QString serverAddress(QInputDialog::getText(this, tr("Chatlis server connection"), tr("Server address (ip:port)")));
 	if (!serverAddress.isEmpty())
 	{
 		QStringList ipAndPort = serverAddress.split(':');
@@ -79,7 +78,7 @@ void QChatRoomMainWindow::actionDisconnectFromServer()
 
 void QChatRoomMainWindow::actionChangeUsername()
 {
-	QString newUsername(QInputDialog::getText(this,	tr("Change username"), tr("Username to display")));
+	QString newUsername(QInputDialog::getText(this, tr("Change username"), tr("Username to display")));
 	if (!newUsername.isEmpty())
 	{
 		if (newUsername.size() > 20)
@@ -135,7 +134,4 @@ QWidget* QChatRoomMainWindow::initParticipantsWidget()
 	return usersWidget;
 }
 
-QChatRoomMainWindow::~QChatRoomMainWindow()
-{
-	delete serverConnection;
-}
+QChatRoomMainWindow::~QChatRoomMainWindow() {}
