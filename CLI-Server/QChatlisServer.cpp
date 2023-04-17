@@ -4,14 +4,11 @@
 #include "../QClientInfo.h"
 #include <QPair>
 #include <QSslConfiguration>
-#include <iostream>
-
-using namespace std;
 
 const quint16 QChatlisServer::PORT_NB{ 59532 };
 
 QChatlisServer::QChatlisServer()
-	: connectedClients()
+	: connectedClients(), cout(stdout)
 {
 	connect(this, &QTcpServer::pendingConnectionAvailable, this, &QChatlisServer::getNextPendingConnection);
 	listen(QHostAddress::Any, QChatlisServer::PORT_NB);
@@ -19,7 +16,8 @@ QChatlisServer::QChatlisServer()
 
 void QChatlisServer::serverLog(const QString& message)
 {
-	cout << message.toStdString() << endl;
+	cout << message << '\n';
+	cout.flush();
 }
 
 void QChatlisServer::incomingConnection(qintptr socketDescriptor)

@@ -4,6 +4,8 @@
 #include <QList>
 #include "QClientConnection.h"
 #include <QString>
+#include <QTextStream>
+
 
 class QChatlisServer : public QSslServer
 {
@@ -28,6 +30,7 @@ private slots:
 
 private:
     QList<QClientConnection*> connectedClients;
+    QTextStream cout;
 
     void serverLog(const QString& message);
 };

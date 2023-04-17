@@ -1,8 +1,8 @@
 #include "QChatlisServer.h"
 #include <QCoreApplication>
 #include <QNetworkInterface>
-#include <iostream>
 #include <QLockFile>
+#include <QTextStream>
 #include <QDir>
 
 int main(int argc, char* argv[])
@@ -20,14 +20,15 @@ int main(int argc, char* argv[])
 		if (address.protocol() == QHostAddress::NetworkLayerProtocol::IPv4Protocol)
 			foundIPV4Addresses += ' ' + address.toString() + " |";
 
+	QTextStream cout(stdout);
 	if (foundIPV4Addresses.size() > 0)
 	{
 		foundIPV4Addresses.remove(foundIPV4Addresses.size() - 1, 1);
-		std::cout << "Your local ip address(es) : " + foundIPV4Addresses.toStdString() << std::endl;
-		std::cout << "Log : server listening on port " + QString::number(QChatlisServer::PORT_NB).toStdString() << std::endl;
+		cout << "Your local ip address(es) : " << foundIPV4Addresses << '\n';
+		cout << "Log : server listening on port " << QString::number(QChatlisServer::PORT_NB) << '\n';
 	}
 	else
-		std::cout << "No local ip address found.";
-
+		cout << "No local ip address found.";
+	cout.flush();
 	return app.exec();
 }
