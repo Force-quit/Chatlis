@@ -7,6 +7,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Chatlis-client", "Chatlis-c
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Chatlis-server", "Chatlis-server\Chatlis-server.vcxproj", "{0E5179E4-D32A-4EC1-8931-828954915396}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Chatlis-CLI", "Chatlis-server\Chatlis-CLI.vcxproj", "{15E2070F-F41C-4F45-8D39-E6AB7E409C3E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -21,6 +23,10 @@ Global
 		{0E5179E4-D32A-4EC1-8931-828954915396}.Debug|x64.Build.0 = Debug|x64
 		{0E5179E4-D32A-4EC1-8931-828954915396}.Release|x64.ActiveCfg = Release|x64
 		{0E5179E4-D32A-4EC1-8931-828954915396}.Release|x64.Build.0 = Release|x64
+		{15E2070F-F41C-4F45-8D39-E6AB7E409C3E}.Debug|x64.ActiveCfg = Debug|x64
+		{15E2070F-F41C-4F45-8D39-E6AB7E409C3E}.Debug|x64.Build.0 = Debug|x64
+		{15E2070F-F41C-4F45-8D39-E6AB7E409C3E}.Release|x64.ActiveCfg = Release|x64
+		{15E2070F-F41C-4F45-8D39-E6AB7E409C3E}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
