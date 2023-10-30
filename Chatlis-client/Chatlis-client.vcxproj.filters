@@ -52,12 +52,15 @@
     <ClInclude Include="..\Common\NetworkMessage.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Resources\resource.h">
+      <Filter>Resource Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="Resources\group-chat.ico">
+    <Image Include="Resources\group-chat.png">
       <Filter>Resource Files</Filter>
     </Image>
-    <Image Include="Resources\group-chat.png">
+    <Image Include="group-chat.ico">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>
@@ -83,5 +86,10 @@
     <QtMoc Include="Headers\QParticipantsPanel.h">
       <Filter>Header Files</Filter>
     </QtMoc>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Resources\Chatlis-client.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
   </ItemGroup>
 </Project>

@@ -1,7 +1,7 @@
-#include "QChatlisServer.h"
+#include "../Headers/QChatlisServer.h"
 #include <QtNetwork>
 #include <QVector>
-#include "../QClientInfo.h"
+#include "../../Common/QClientInfo.h"
 #include <QPair>
 #include <QSslConfiguration>
 

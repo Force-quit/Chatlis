@@ -1,5 +1,5 @@
-#include "QClientConnection.h"
-#include "../NetworkMessage.h"
+#include "../Headers/QClientConnection.h"
+#include "../../Common/NetworkMessage.h"
 #include <QString>
 #include <QFile>
 #include <QSslKey>

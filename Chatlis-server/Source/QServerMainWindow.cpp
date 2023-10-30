@@ -1,4 +1,4 @@
-#include "QServerMainWindow.h"
+#include "../Headers/QServerMainWindow.h"
 #include <QVBoxLayout>
 #include <QLabel>
 #include <QHostAddress>

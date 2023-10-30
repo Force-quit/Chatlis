@@ -1,5 +1,5 @@
 #include <QApplication>
-#include "QServerMainWindow.h"
+#include "../Headers/QServerMainWindow.h"
 #include <QLockFile>
 #include <QDir>
 

@@ -100,6 +100,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Common\NetworkMessage.h" />
+    <ClInclude Include="Resources\resource.h" />
     <QtMoc Include="..\Common\QClientInfo.h" />
     <QtMoc Include="Headers\QChatbox.h" />
     <QtMoc Include="Headers\QChatlisMenuBar.h" />
@@ -109,8 +110,11 @@
     <QtMoc Include="Headers\QServerConnection.h" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="Resources\group-chat.ico" />
+    <Image Include="group-chat.ico" />
     <Image Include="Resources\group-chat.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Resources\Chatlis-client.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">
