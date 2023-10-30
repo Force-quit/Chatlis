@@ -1,4 +1,4 @@
-#include "QChatWidget.h"
+#include "../Headers/QChatWidget.h"
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QPushButton>

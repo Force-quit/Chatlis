@@ -1,4 +1,4 @@
-#include "QChatbox.h"
+#include "../Headers/QChatbox.h"
 #include <QTextCursor>
 #include <QTextTable>
 #include <QScrollBar>

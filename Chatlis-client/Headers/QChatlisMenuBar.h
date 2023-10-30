@@ -10,6 +10,8 @@ public:
 	QChatlisMenuBar(QWidget *parent = nullptr);
 	~QChatlisMenuBar();
 
+public slots:
+
 signals:
 	void actionConnectToServer();
 	void actionDisconnectFromServer();

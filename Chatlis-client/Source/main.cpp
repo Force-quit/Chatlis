@@ -1,5 +1,5 @@
 #include <QApplication>
-#include "QChatRoomMainWindow.h"
+#include "../Headers/QChatRoomMainWindow.h"
 
 int main(int argc, char* argv[])
 {

@@ -6,7 +6,7 @@
 #include <QSslCertificate>
 
 QClientConnection::QClientConnection(QObject* parent, qintptr socketDescriptor)
-	: QSslSocket(parent), client(false), encrypted(false)
+	: QSslSocket(parent), client(false)
 {
 	QFile keyFile("SSL/server.key");
 	keyFile.open(QIODevice::ReadOnly);
@@ -24,7 +24,6 @@ QClientConnection::QClientConnection(QObject* parent, qintptr socketDescriptor)
 	startServerEncryption();
 
 	connect(this, &QClientConnection::readyRead, this, &QClientConnection::receivedData);
-	connect(this, &QSslSocket::encrypted, [=]() { encrypted = true; });
 }
 
 void QClientConnection::replicateExistingClients(const QList<QPair<QString, QString>>& existingClients)
@@ -94,11 +93,6 @@ QString QClientConnection::getClientComputerName() const
 	return client.getComputerName();
 }
 
-bool QClientConnection::getEncrypted()
-{
-	return encrypted;
-}
-
 void QClientConnection::receivedData()
 {
 	QByteArray buffer;
@@ -155,4 +149,5 @@ void QClientConnection::sendNetworkMessage(const QByteArray& toSend)
 
 QClientConnection::~QClientConnection() 
 {
+	qDebug("Delete QClient");
 }

@@ -8,6 +8,7 @@
 #include "QParticipantsPanel.h"
 #include <QLabel>
 #include <QVBoxLayout>
+#include "../../Common/QClientInfo.h"
 
 class QChatRoomMainWindow : public QMainWindow
 {

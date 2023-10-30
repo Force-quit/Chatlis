@@ -20,7 +20,6 @@ public:
 
 	QString getClientUsername() const;
 	QString getClientComputerName() const;
-	bool getEncrypted();
 
 signals:
 	void newClient();
@@ -35,5 +34,4 @@ private:
 	void sendNetworkMessage(const QByteArray& toSend);
 
 	QClientInfo client;
-	bool encrypted;
 };

@@ -3,7 +3,7 @@
 #include <QWidget>
 #include "QChatbox.h"
 #include <QLineEdit>
-#include "../QClientInfo.h"
+#include "../../Common/QClientInfo.h"
 
 class QChatWidget : public QWidget
 {
