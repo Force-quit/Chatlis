@@ -88,7 +88,7 @@ void QChatlisServer::clientDisconnected()
 {
 	QClientConnection* disconnectedClient{ dynamic_cast<QClientConnection*>(sender()) };
 	
-	if (disconnectedClient->isEncrypted())
+	if (disconnectedClient->getEncrypted())
 	{
 		const QString& username = disconnectedClient->getClientUsername();
 		const QString& computerName = disconnectedClient->getClientComputerName();
