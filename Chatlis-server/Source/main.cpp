@@ -1,5 +1,6 @@
 #include <QApplication>
 #include "../Headers/QServerMainWindow.h"
+#include <QStyleFactory>
 #include <QLockFile>
 #include <QDir>
 
@@ -10,6 +11,7 @@ int main(int argc, char* argv[])
         return 0;
 
     QApplication app(argc, argv);
+    QApplication::setStyle(QStyleFactory::create("Fusion"));
 
     QServerMainWindow serverWindow;
     serverWindow.show();

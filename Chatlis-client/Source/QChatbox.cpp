@@ -1,13 +1,13 @@
 #include "../Headers/QChatbox.h"
 #include <QTextCursor>
 #include <QTextTable>
+#include <QApplication>
 #include <QScrollBar>
 #include <QColor>
 #include <QDateTime>
 #include <QSizePolicy>
 
 const QColor QChatbox::SERVER_MESSAGE_TEXT_COLOR{ Qt::gray };
-const QColor QChatbox::USER_MESSAGE_TEXT_COLOR{ Qt::black };
 const QColor QChatbox::SYSTEM_MESSAGE_TEXT_COLOR{ Qt::red };
 
 
@@ -38,7 +38,7 @@ void QChatbox::appendServerMessage(const QString message)
 
 void QChatbox::appendUserMessage(const QString& from, const QString& message)
 {
-    setTextColor(QChatbox::USER_MESSAGE_TEXT_COLOR);
+    setTextColor(QApplication::palette().text().color());
 
     QScrollBar* bar{ verticalScrollBar() };
     bool scrollBarWasAtBottom{ bar->value() == bar->maximum() };
