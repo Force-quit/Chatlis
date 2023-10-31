@@ -100,11 +100,6 @@ bool QClientConnection::getEncrypted() const
 	return isEncrypted;
 }
 
-void QClientConnection::setEncrypted(bool isEncrypted)
-{
-	this->isEncrypted = isEncrypted;
-}
-
 void QClientConnection::receivedData()
 {
 	QByteArray buffer;
