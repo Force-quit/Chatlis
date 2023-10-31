@@ -19,7 +19,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\Common\NetworkMessage.h">
+    <ClInclude Include="..\Common\NetworkMessageType.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

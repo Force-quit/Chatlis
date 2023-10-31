@@ -2,6 +2,7 @@
 
 #include <QSslServer>
 #include <QList>
+#include <QStringView>
 #include "../Headers/QClientConnection.h"
 #include <QString>
 #include <QTextStream>
@@ -9,28 +10,28 @@
 
 class QChatlisServer : public QSslServer
 {
-    Q_OBJECT
+	Q_OBJECT
 
 public:
-    QChatlisServer();
-    ~QChatlisServer();
+	QChatlisServer();
+	~QChatlisServer();
 
-    const static quint16 PORT_NB;
+	constexpr static quint16 PORT_NB{ 59532 };
 
 protected:
-    void incomingConnection(qintptr socketDescriptor) override;
+	void incomingConnection(qintptr socketDescriptor) override;
 
 private slots:
-    void clientDisconnected();
-    void replicateClientMessage(const QString message);
-    void replicateNewUser();
-    void replicateClientNewUsername(const QString previousUsername);
-    void replicateClientNewComputerName(const QString previousComputerName);
-    void getNextPendingConnection();
+	void clientDisconnected();
+	void replicateClientMessage(const QString message);
+	void replicateNewUser();
+	void replicateClientNewUsername(const QString previousUsername);
+	void replicateClientNewComputerName(const QString previousComputerName);
+	void getNextPendingConnection();
 
 private:
-    QList<QClientConnection*> connectedClients;
-    QTextStream cout;
+	QList<QClientConnection*> connectedClients;
+	QTextStream cout;
 
-    void serverLog(const QString& message);
+	void serverLog(QStringView message);
 };

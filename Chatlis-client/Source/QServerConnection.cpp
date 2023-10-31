@@ -3,7 +3,7 @@
 #include <QDataStream>
 #include <QByteArray>
 #include <QThread>
-#include "../../Common/NetworkMessage.h"
+#include "../../Common/NetworkMessageType.h"
 #include <QFile>
 #include <QSslKey>
 #include <QSslCertificate>
@@ -51,7 +51,7 @@ void QServerConnection::connectToServer(const QString& address, const QString& p
 				emit appendSystemMessage("Encrypted connection established");
 				QByteArray buffer;
 				QDataStream dataStream(&buffer, QIODevice::WriteOnly);
-				dataStream << NetworkMessage::Type::clientRegistration << username << computerName;
+				dataStream << NetworkMessageType::clientRegistration << username << computerName;
 
 				QDataStream dataToSend(this);
 				dataToSend << buffer;
@@ -73,7 +73,7 @@ void QServerConnection::sendNewChatMessage(const QString& message)
 	{
 		QByteArray buffer;
 		QDataStream dataStream(&buffer, QIODevice::WriteOnly);
-		dataStream << NetworkMessage::Type::clientSentMessage << message;
+		dataStream << NetworkMessageType::clientSentMessage << message;
 		QDataStream dataToSend(this);
 		dataToSend << buffer;
 	}
@@ -83,7 +83,7 @@ void QServerConnection::changeUserName(const QString& newUsername)
 {
 	QByteArray buffer;
 	QDataStream dataStream(&buffer, QIODevice::WriteOnly);
-	dataStream << NetworkMessage::Type::clientChangeUsername << newUsername;
+	dataStream << NetworkMessageType::clientChangeUsername << newUsername;
 	QDataStream dataToSend(this);
 	dataToSend << buffer;
 }
@@ -92,7 +92,7 @@ void QServerConnection::changeComputerName(const QString& newComputerName)
 {
 	QByteArray buffer;
 	QDataStream dataStream(&buffer, QIODevice::WriteOnly);
-	dataStream << NetworkMessage::Type::clientChangeComputerName << newComputerName;
+	dataStream << NetworkMessageType::clientChangeComputerName << newComputerName;
 	QDataStream dataToSend(this);
 	dataToSend << buffer;
 }
@@ -104,7 +104,7 @@ void QServerConnection::receivedData()
 	dataStream >> buffer;
 	QDataStream processedData(buffer);
 
-	NetworkMessage::Type messageType{};
+	NetworkMessageType messageType{};
 	processedData >> messageType;
 
 	QString previousUsername;
@@ -115,12 +115,12 @@ void QServerConnection::receivedData()
 
 	switch (messageType)
 	{
-		case NetworkMessage::Type::clientSentMessage:
+		case NetworkMessageType::clientSentMessage:
 			processedData >> username;
 			processedData >> message;
 			emit addMessageToChatbox(username, message);
 			break;
-		case NetworkMessage::Type::replicateExistingClients:
+		case NetworkMessageType::replicateExistingClients:
 			while (!processedData.atEnd())
 			{
 				processedData >> username;
@@ -128,27 +128,27 @@ void QServerConnection::receivedData()
 				emit newClient(username, computerName);
 			}
 			break;
-		case NetworkMessage::Type::clientAdded:
+		case NetworkMessageType::clientAdded:
 			processedData >> username;
 			processedData >> computerName;
 			emit appendServerMessage(username + " has joined the server");
 			emit newClient(username, computerName);
 			break;
-		case NetworkMessage::Type::clientChangeUsername:
+		case NetworkMessageType::clientChangeUsername:
 			processedData >> previousUsername;
 			processedData >> computerName;
 			processedData >> username;
 			emit otherClientChangedUsername(previousUsername, computerName, username);
 			emit appendServerMessage(previousUsername + '@' + computerName + " changed their name to " + username + '@' + computerName);
 			break;
-		case NetworkMessage::Type::clientChangeComputerName :
+		case NetworkMessageType::clientChangeComputerName :
 			processedData >> username;
 			processedData >> previousComputerName;
 			processedData >> computerName;
 			emit otherClientChangedComputerName(username, previousComputerName, computerName);
 			emit appendServerMessage(username + '@' + previousComputerName + " changed their name to " + username + '@' + computerName);
 			break;
-		case NetworkMessage::Type::clientDisconnected:
+		case NetworkMessageType::clientDisconnected:
 			processedData >> username;
 			processedData >> computerName;
 			emit removeClient(username, computerName);

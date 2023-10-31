@@ -1,14 +1,14 @@
 #include "../Headers/QClientConnection.h"
-#include "../../Common/NetworkMessage.h"
+#include "../../Common/NetworkMessageType.h"
 #include <QString>
 #include <QFile>
 #include <QSslKey>
 #include <QSslCertificate>
 
 QClientConnection::QClientConnection(QObject* parent, qintptr socketDescriptor)
-	: QSslSocket(parent), client(false), isEncrypted{false}
+	: QSslSocket(parent), client(false), isEncrypted{ false }
 {
-	
+
 	QFile keyFile("SSL/server.key");
 	keyFile.open(QIODevice::ReadOnly);
 	QSslKey privateKey = QSslKey(keyFile.readAll(), QSsl::Rsa);
@@ -32,7 +32,7 @@ void QClientConnection::replicateExistingClients(const QList<QPair<QString, QStr
 {
 	QByteArray byteArray;
 	QDataStream dataStream(&byteArray, QIODevice::WriteOnly);
-	dataStream << NetworkMessage::Type::replicateExistingClients;
+	dataStream << NetworkMessageType::replicateExistingClients;
 
 	for (auto& clientInfo : existingClients)
 		dataStream << clientInfo.first << clientInfo.second;
@@ -44,7 +44,7 @@ void QClientConnection::replicateClientMessage(const QString& clientName, const 
 {
 	QByteArray byteArray;
 	QDataStream dataStream(&byteArray, QIODevice::WriteOnly);
-	dataStream << NetworkMessage::Type::clientSentMessage << clientName << message;
+	dataStream << NetworkMessageType::clientSentMessage << clientName << message;
 
 	sendNetworkMessage(byteArray);
 }
@@ -53,7 +53,7 @@ void QClientConnection::replicateNewClient(const QString& clientName, const QStr
 {
 	QByteArray byteArray;
 	QDataStream dataStream(&byteArray, QIODevice::WriteOnly);
-	dataStream << NetworkMessage::Type::clientAdded << clientName << computerName;
+	dataStream << NetworkMessageType::clientAdded << clientName << computerName;
 
 	sendNetworkMessage(byteArray);
 }
@@ -62,7 +62,7 @@ void QClientConnection::replicateDisconnect(const QString& clientName, const QSt
 {
 	QByteArray byteArray;
 	QDataStream dataStream(&byteArray, QIODevice::WriteOnly);
-	dataStream << NetworkMessage::Type::clientDisconnected << clientName << computerName;
+	dataStream << NetworkMessageType::clientDisconnected << clientName << computerName;
 
 	sendNetworkMessage(byteArray);
 }
@@ -71,7 +71,7 @@ void QClientConnection::replicateClientNewUsername(const QString previousUsernam
 {
 	QByteArray byteArray;
 	QDataStream dataStream(&byteArray, QIODevice::WriteOnly);
-	dataStream << NetworkMessage::Type::clientChangeUsername << previousUsername << computerName << newUsername;
+	dataStream << NetworkMessageType::clientChangeUsername << previousUsername << computerName << newUsername;
 
 	sendNetworkMessage(byteArray);
 }
@@ -80,7 +80,7 @@ void QClientConnection::replicateClientNewComputerName(const QString username, c
 {
 	QByteArray byteArray;
 	QDataStream dataStream(&byteArray, QIODevice::WriteOnly);
-	dataStream << NetworkMessage::Type::clientChangeComputerName << username << previousComputerName << newComputerName;
+	dataStream << NetworkMessageType::clientChangeComputerName << username << previousComputerName << newComputerName;
 
 	sendNetworkMessage(byteArray);
 }
@@ -107,7 +107,7 @@ void QClientConnection::receivedData()
 	dataStream >> buffer;
 	QDataStream processedData(buffer);
 
-	NetworkMessage::Type messageType{};
+	NetworkMessageType messageType{};
 	processedData >> messageType;
 
 	QString previousComputerName(client.getComputerName());
@@ -120,26 +120,26 @@ void QClientConnection::receivedData()
 
 	switch (messageType)
 	{
-	case NetworkMessage::Type::invalidType:
+	case NetworkMessageType::invalidType:
 		break;
-	case NetworkMessage::Type::clientRegistration:
+	case NetworkMessageType::clientRegistration:
 		processedData >> username;
 		processedData >> computerName;
 		client.setUsername(username);
 		client.setComputerName(computerName);
 		emit newClient();
 		break;
-	case NetworkMessage::Type::clientChangeUsername:
+	case NetworkMessageType::clientChangeUsername:
 		processedData >> username;
 		client.setUsername(username);
 		emit newClientName(previousUsername);
 		break;
-	case NetworkMessage::Type::clientChangeComputerName:
+	case NetworkMessageType::clientChangeComputerName:
 		processedData >> computerName;
 		client.setComputerName(computerName);
 		emit newClientComputerName(previousComputerName);
 		break;
-	case NetworkMessage::Type::clientSentMessage:
+	case NetworkMessageType::clientSentMessage:
 		processedData >> clientMessage;
 		emit newClientMessage(clientMessage);
 		break;

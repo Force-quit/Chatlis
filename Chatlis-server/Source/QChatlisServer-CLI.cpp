@@ -5,8 +5,6 @@
 #include <QPair>
 #include <QSslConfiguration>
 
-const quint16 QChatlisServer::PORT_NB{ 59532 };
-
 QChatlisServer::QChatlisServer()
 	: connectedClients(), cout(stdout)
 {
@@ -14,7 +12,7 @@ QChatlisServer::QChatlisServer()
 	listen(QHostAddress::Any, QChatlisServer::PORT_NB);
 }
 
-void QChatlisServer::serverLog(const QString& message)
+void QChatlisServer::serverLog(QStringView message)
 {
 	cout << message << '\n';
 	cout.flush();

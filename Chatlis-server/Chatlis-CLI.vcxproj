@@ -17,7 +17,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\Common\NetworkMessage.h" />
+    <ClInclude Include="..\Common\NetworkMessageType.h" />
     <QtMoc Include="Headers\QClientConnection.h" />
     <QtMoc Include="..\Common\QClientInfo.h" />
     <QtMoc Include="Headers\QChatlisServer-CLI.h" />
