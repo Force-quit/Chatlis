@@ -30,6 +30,8 @@ signals:
   
 public slots:
 	void receivedData();
+
+private slots:
 	void onEncrypted();
 
 private:
