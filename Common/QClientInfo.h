@@ -4,7 +4,7 @@
 #include <QString>
 #include <QHostAddress>
 
-class QClientInfo  : public QObject
+class QClientInfo : public QObject
 {
 	Q_OBJECT
 
@@ -13,8 +13,8 @@ public:
 
 	~QClientInfo();
 
-	QString getUsername() const;
-	QString getComputerName() const;
+	[[nodiscard]] QString getUsername() const;
+	[[nodiscard]] QString getComputerName() const;
 
 	void setUsername(const QString& newName);
 	void setComputerName(const QString& newComputerName);

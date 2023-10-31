@@ -69,11 +69,14 @@ void QServerConnection::connectToServer(const QString& address, const QString& p
 
 void QServerConnection::sendNewChatMessage(const QString& message)
 {
-	QByteArray buffer;
-	QDataStream dataStream(&buffer, QIODevice::WriteOnly);
-	dataStream << NetworkMessage::Type::clientSentMessage << message;
-	QDataStream dataToSend(this);
-	dataToSend << buffer;
+	if (isEncrypted())
+	{
+		QByteArray buffer;
+		QDataStream dataStream(&buffer, QIODevice::WriteOnly);
+		dataStream << NetworkMessage::Type::clientSentMessage << message;
+		QDataStream dataToSend(this);
+		dataToSend << buffer;
+	}
 }
 
 void QServerConnection::changeUserName(const QString& newUsername)
