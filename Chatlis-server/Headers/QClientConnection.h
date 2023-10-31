@@ -9,7 +9,6 @@ class QClientConnection : public QSslSocket
 
 public:
 	QClientConnection(QObject* parent, qintptr socketDescriptor);
-	~QClientConnection();
 
 	void replicateExistingClients(const QList<QPair<QString, QString>>& existingClients);
 	void replicateClientMessage(const QString& clientName, const QString& message);
@@ -18,8 +17,10 @@ public:
 	void replicateClientNewUsername(const QString previousUsername, const QString computerName, const QString newUsername);
 	void replicateClientNewComputerName(const QString username, const QString previousComputerName, const QString newComputerName);
 
-	QString getClientUsername() const;
-	QString getClientComputerName() const;
+	[[nodiscard]] QString getClientUsername() const;
+	[[nodiscard]] QString getClientComputerName() const;
+	[[nodiscard]] bool getEncrypted() const;
+	void setEncrypted(bool encrypted);
 
 signals:
 	void newClient();
@@ -29,9 +30,10 @@ signals:
   
 public slots:
 	void receivedData();
+	void onEncrypted();
 
 private:
 	void sendNetworkMessage(const QByteArray& toSend);
-
+	bool isEncrypted;
 	QClientInfo client;
 };
