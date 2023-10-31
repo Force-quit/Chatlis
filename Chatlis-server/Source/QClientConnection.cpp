@@ -155,7 +155,7 @@ void QClientConnection::receivedData()
 
 void QClientConnection::onEncrypted()
 {
-	setEncrypted(true);
+	isEncrypted = true;
 }
 
 

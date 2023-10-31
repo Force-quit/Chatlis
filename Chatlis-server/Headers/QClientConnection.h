@@ -20,7 +20,6 @@ public:
 	[[nodiscard]] QString getClientUsername() const;
 	[[nodiscard]] QString getClientComputerName() const;
 	[[nodiscard]] bool getEncrypted() const;
-	void setEncrypted(bool encrypted);
 
 signals:
 	void newClient();
