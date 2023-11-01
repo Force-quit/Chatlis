@@ -6,7 +6,7 @@
 #include <QLineEdit>
 
 QChatWidget::QChatWidget(QWidget *parent, const QClientInfo& clientInfo)
-	: QWidget(parent), chatBox{ new QChatbox(this) }, textInput{ new QLineEdit(this) }, clientInfo(clientInfo)
+	: QWidget(parent), chatBox{ new QChatbox(this, clientInfo) }, textInput{ new QLineEdit(this) }, clientInfo(clientInfo)
 {
 	QSizePolicy modifiedPolicy{ sizePolicy() };
 	modifiedPolicy.setHorizontalStretch(2);

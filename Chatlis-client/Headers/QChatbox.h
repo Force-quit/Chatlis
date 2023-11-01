@@ -3,13 +3,14 @@
 #include <QTextEdit>
 #include <QString>
 #include <QColor>
+#include "../../Common/QClientInfo.h"
 
 class QChatbox : public QTextEdit
 {
 	Q_OBJECT
 
 public:
-	QChatbox(QWidget *parent = nullptr);
+	QChatbox(QWidget *parent = nullptr, const QClientInfo& clientInfo = NULL);
 	~QChatbox();
 
 public slots:
@@ -18,9 +19,11 @@ public slots:
 	void appendServerMessage(const QString message);
 
 private:
-	static const QColor USER_MESSAGE_TEXT_COLOR;
 	static const QColor SERVER_MESSAGE_TEXT_COLOR;
 	static const QColor SYSTEM_MESSAGE_TEXT_COLOR;
+	static const QColor USER_MESSAGE_PING_BG_COLOR;
+
+	const QClientInfo& clientInfo;
 
 	void appendTextWithTime(const QString& toAppend);
 };
