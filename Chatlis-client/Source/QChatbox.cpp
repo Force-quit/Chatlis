@@ -12,7 +12,7 @@ const QColor QChatbox::SYSTEM_MESSAGE_TEXT_COLOR{ Qt::red };
 const QColor QChatbox::USER_MESSAGE_PING_BG_COLOR{ QColor(0,0,255,50)};
 
 
-QChatbox::QChatbox(QWidget *parent, const QClientInfo& clientInfo)
+QChatbox::QChatbox(const QClientInfo& clientInfo, QWidget *parent) 
 	: QTextEdit(parent), clientInfo(clientInfo)
 {
     setFocusPolicy(Qt::NoFocus);

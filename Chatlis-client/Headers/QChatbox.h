@@ -10,7 +10,7 @@ class QChatbox : public QTextEdit
 	Q_OBJECT
 
 public:
-	QChatbox(QWidget *parent = nullptr, const QClientInfo& clientInfo = NULL);
+	QChatbox(const QClientInfo& clientInfo, QWidget *parent = nullptr);
 	~QChatbox();
 
 public slots:
