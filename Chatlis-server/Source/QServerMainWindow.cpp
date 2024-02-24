@@ -7,27 +7,22 @@
 #include <QStringList>
 #include <QGroupBox>
 
-QServerMainWindow::QServerMainWindow(QWidget *parent)
-	: QMainWindow(parent), server{ new QChatlisServer }, output{}
+QServerMainWindow::QServerMainWindow()
+	: QMainWindow(), server(), output{}
 {
-	QWidget* centralWidget{ new QWidget };
-	QVBoxLayout* centralLayout{ new QVBoxLayout };
-	
 	QGroupBox* serverLog{ initOutputGroupBox() };
 
-	centralLayout->addWidget(serverLog);
-	centralWidget->setLayout(centralLayout);
-	setCentralWidget(centralWidget);
+	setCentralWidget(serverLog);
 	setWindowTitle("Chatlis - Server");
-	resize(400, 200);
+	resize(500, 200);
 
-	connect(server, &QChatlisServer::serverLog, output, &QTextEdit::append);
+	connect(&server, &QChatlisServer::serverLog, output, &QTextEdit::append);
 }
 
 
 QGroupBox* QServerMainWindow::initOutputGroupBox()
 {
-	QGroupBox* outputGroupBox{ new QGroupBox("Output") };
+	QGroupBox* outputGroupBox{ new QGroupBox };
 	outputGroupBox->setFocusPolicy(Qt::NoFocus);
 	QVBoxLayout* outputGroupBoxLayout{ new QVBoxLayout };
 
@@ -40,8 +35,12 @@ QGroupBox* QServerMainWindow::initOutputGroupBox()
 
 	QString foundIPV4Addresses;
 	for (const QHostAddress& address : QNetworkInterface::allAddresses())
+	{
 		if (address.protocol() == QHostAddress::NetworkLayerProtocol::IPv4Protocol)
+		{
 			foundIPV4Addresses += ' ' + address.toString() + " |";
+		}
+	}
 
 	if (foundIPV4Addresses.size() > 0)
 	{
@@ -50,12 +49,9 @@ QGroupBox* QServerMainWindow::initOutputGroupBox()
 		output->append("Log : server listening on port " + QString::number(QChatlisServer::PORT_NB));
 	}
 	else
+	{
 		output->append("No local ip address found.");
+	}
 
 	return outputGroupBox;
-}
-
-QServerMainWindow::~QServerMainWindow() 
-{
-	delete server;
 }
