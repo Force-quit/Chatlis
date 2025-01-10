@@ -1,4 +1,4 @@
-#include "../Headers/QChatlisServer-CLI.h"
+#include "QChatlisServer-CLI.h"
 #include <QCoreApplication>
 #include <QNetworkInterface>
 #include <QLockFile>

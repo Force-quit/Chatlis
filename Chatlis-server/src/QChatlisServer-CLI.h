@@ -2,7 +2,7 @@
 
 #include <QSslServer>
 #include <QList>
-#include "../Headers/QClientConnection.h"
+#include "QClientConnection.h"
 #include <QString>
 #include <QTextStream>
 

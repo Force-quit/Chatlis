@@ -1,17 +1,23 @@
-#include "../Headers/QChatlisServer.h"
+#include "QChatlisServer-CLI.h"
 #include <QtNetwork>
 #include <QVector>
-#include "../../Common/QClientInfo.h"
+#include "QClientInfo.h"
 #include <QPair>
 #include <QSslConfiguration>
 
 const quint16 QChatlisServer::PORT_NB{ 59532 };
 
 QChatlisServer::QChatlisServer()
-	: connectedClients()
+	: connectedClients(), cout(stdout)
 {
 	connect(this, &QTcpServer::pendingConnectionAvailable, this, &QChatlisServer::getNextPendingConnection);
 	listen(QHostAddress::Any, QChatlisServer::PORT_NB);
+}
+
+void QChatlisServer::serverLog(const QString& message)
+{
+	cout << message << '\n';
+	cout.flush();
 }
 
 void QChatlisServer::incomingConnection(qintptr socketDescriptor)
@@ -49,7 +55,7 @@ void QChatlisServer::replicateNewUser()
 
 	QString log("Log : connection opened with client [%1] (%2)");
 	QHostAddress formated(senderConnection->peerAddress().toIPv4Address());
-	emit serverLog(log.arg(username, formated.toString()));
+	serverLog(log.arg(username, formated.toString()));
 
 	for (QClientConnection* client : connectedClients)
 		if (client != senderConnection)
@@ -95,7 +101,7 @@ void QChatlisServer::clientDisconnected()
 
 		QString log("Log : connection closed with client [%1] (%2)");
 		QHostAddress formated(disconnectedClient->peerAddress().toIPv4Address());
-		emit serverLog(log.arg(username, formated.toString()));
+		serverLog(log.arg(username, formated.toString()));
 
 		for (QClientConnection* client : connectedClients)
 			if (client != disconnectedClient)
