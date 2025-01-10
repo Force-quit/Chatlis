@@ -1,4 +1,4 @@
-#include "../Headers/QChatlisMenuBar.h"
+#include "QChatlisMenuBar.h"
 #include <QAction>
 #include <QKeySequence>
 

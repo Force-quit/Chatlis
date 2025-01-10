@@ -1,9 +1,9 @@
-#include "../Headers/QServerConnection.h"
+#include "QServerConnection.h"
 #include <QHostAddress>
 #include <QDataStream>
 #include <QByteArray>
 #include <QThread>
-#include "../../Common/NetworkMessage.h"
+#include "NetworkMessage.h"
 #include <QFile>
 #include <QSslKey>
 #include <QSslCertificate>

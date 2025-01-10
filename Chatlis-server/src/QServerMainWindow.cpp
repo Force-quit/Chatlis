@@ -19,8 +19,8 @@ QServerMainWindow::QServerMainWindow(QWidget *parent)
 	centralWidget->setLayout(centralLayout);
 	setCentralWidget(centralWidget);
 	setWindowTitle("Chatlis - Server");
+	setWindowIcon(QIcon(":/images/server.png"));
 	resize(400, 200);
-
 	connect(server, &QChatlisServer::serverLog, output, &QTextEdit::append);
 }
 

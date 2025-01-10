@@ -1,12 +1,12 @@
-#include "../Headers/QChatRoomMainWindow.h"
+#include "QChatRoomMainWindow.h"
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QSplitter>
-#include "../Headers/QChatbox.h"
+#include "QChatbox.h"
 #include <QTimer>
 #include <QIcon>
-#include "../Headers/QParticipantsPanel.h"
+#include "QParticipantsPanel.h"
 #include <QLineEdit>
 #include <QMenuBar>
 #include <QAction>
@@ -15,9 +15,9 @@
 #include <QInputDialog>
 #include <QMessageBox>
 #include <QGroupBox>
-#include "../Headers/QServerConnection.h"
-#include "../Headers/QChatlisMenuBar.h"
-#include "../Headers/QChatWidget.h"
+#include "QServerConnection.h"
+#include "QChatlisMenuBar.h"
+#include "QChatWidget.h"
 
 QChatRoomMainWindow::QChatRoomMainWindow(QWidget* parent)
 	: QMainWindow(parent), client(true), serverConnection{ new QServerConnection(this) }, 
@@ -35,7 +35,7 @@ QChatRoomMainWindow::QChatRoomMainWindow(QWidget* parent)
 	resize(1000, 400);
 	setCentralWidget(splitter);
 	setWindowTitle("Chatlis");
-	setWindowIcon(QIcon("group-chat.png"));
+	setWindowIcon(QIcon(":/images/client.png"));
 
 	connect(topMenuBar, &QChatlisMenuBar::actionConnectToServer, this, &QChatRoomMainWindow::actionConnectToServer);
 	connect(topMenuBar, &QChatlisMenuBar::actionDisconnectFromServer, this, &QChatRoomMainWindow::actionDisconnectFromServer);

@@ -1,4 +1,4 @@
-#include "../Headers/QParticipantsPanel.h"
+#include "QParticipantsPanel.h"
 #include <QStringList>
 #include <QSizePolicy>
 
