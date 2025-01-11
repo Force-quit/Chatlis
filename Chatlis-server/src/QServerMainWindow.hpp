@@ -10,12 +10,12 @@ class QServerMainWindow : public QMainWindow
 	Q_OBJECT
 
 public:
-	QServerMainWindow(QWidget *parent = nullptr);
-	~QServerMainWindow();
+	QServerMainWindow();
 
 private:
-	QChatlisServer* server;
-	QTextEdit* output;
-
 	QGroupBox* initOutputGroupBox();
+	void displayIpAddresses();
+
+	QTextEdit* mOutputTextEdit{};
+	QChatlisServer mServer;
 };

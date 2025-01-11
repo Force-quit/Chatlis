@@ -1,61 +1,73 @@
-#include "QServerMainWindow.h"
+#include "QServerMainWindow.hpp"
 #include <QVBoxLayout>
-#include <QLabel>
 #include <QHostAddress>
 #include <QNetworkInterface>
 #include <QTextEdit>
-#include <QStringList>
 #include <QGroupBox>
+#include <algorithm>
 
-QServerMainWindow::QServerMainWindow(QWidget *parent)
-	: QMainWindow(parent), server{ new QChatlisServer }, output{}
+QServerMainWindow::QServerMainWindow()
 {
-	QWidget* centralWidget{ new QWidget };
-	QVBoxLayout* centralLayout{ new QVBoxLayout };
+	auto* centralWidget{ new QWidget };
+	setCentralWidget(centralWidget);
+
+	auto* centralLayout{ new QVBoxLayout };
+	centralWidget->setLayout(centralLayout);
 	
 	QGroupBox* serverLog{ initOutputGroupBox() };
-
 	centralLayout->addWidget(serverLog);
-	centralWidget->setLayout(centralLayout);
-	setCentralWidget(centralWidget);
+
 	setWindowTitle("Chatlis - Server");
 	setWindowIcon(QIcon(":/images/server.png"));
-	resize(400, 200);
-	connect(server, &QChatlisServer::serverLog, output, &QTextEdit::append);
+	resize(600, 350);
+	connect(&mServer, &QChatlisServer::serverLog, mOutputTextEdit, &QTextEdit::append);
 }
-
 
 QGroupBox* QServerMainWindow::initOutputGroupBox()
 {
-	QGroupBox* outputGroupBox{ new QGroupBox("Output") };
-	outputGroupBox->setFocusPolicy(Qt::NoFocus);
-	QVBoxLayout* outputGroupBoxLayout{ new QVBoxLayout };
+	auto* groupBox{ new QGroupBox("Output") };
 
-	output = new QTextEdit;
-	output->setReadOnly(true);
-	output->setLineWrapMode(QTextEdit::NoWrap);
+	auto* layout{ new QVBoxLayout };
+	groupBox->setLayout(layout);
 
-	outputGroupBoxLayout->addWidget(output);
-	outputGroupBox->setLayout(outputGroupBoxLayout);
+	mOutputTextEdit = new QTextEdit;
+	mOutputTextEdit->setReadOnly(true);
+	mOutputTextEdit->setLineWrapMode(QTextEdit::NoWrap);
+	layout->addWidget(mOutputTextEdit);
 
-	QString foundIPV4Addresses;
-	for (const QHostAddress& address : QNetworkInterface::allAddresses())
-		if (address.protocol() == QHostAddress::NetworkLayerProtocol::IPv4Protocol)
-			foundIPV4Addresses += ' ' + address.toString() + " |";
+	displayIpAddresses();
 
-	if (foundIPV4Addresses.size() > 0)
-	{
-		foundIPV4Addresses.remove(foundIPV4Addresses.size() - 1, 1);
-		output->append("Your local ip address(es) : " + foundIPV4Addresses);
-		output->append("Log : server listening on port " + QString::number(QChatlisServer::PORT_NB));
-	}
-	else
-		output->append("No local ip address found.");
-
-	return outputGroupBox;
+	return groupBox;
 }
 
-QServerMainWindow::~QServerMainWindow() 
+void QServerMainWindow::displayIpAddresses()
 {
-	delete server;
+	QString IPV4Addresses;
+	bool isFirstItem{ true };
+	std::ranges::for_each(QNetworkInterface::allAddresses(), [&IPV4Addresses, &isFirstItem](const QHostAddress& address)
+	{
+		if (address.protocol() == QHostAddress::NetworkLayerProtocol::IPv4Protocol)
+		{
+			if (isFirstItem)
+			{
+				IPV4Addresses += QString("%1").arg(address.toString());
+			}
+			else
+			{
+				IPV4Addresses += QString(" | %1").arg(address.toString());
+			}
+
+			isFirstItem = false;
+		}
+	});
+
+	if (!IPV4Addresses.isEmpty())
+	{
+		mOutputTextEdit->append("Your local ip address(es) : " + IPV4Addresses);
+		mOutputTextEdit->append("Log : server listening on port " + QString::number(QChatlisServer::PORT_NB));
+	}
+	else
+	{
+		mOutputTextEdit->append("No local ip address found.");
+	}
 }

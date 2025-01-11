@@ -12,7 +12,7 @@ set(SERVER_SOURCE
     src/main.cpp
 
     src/QClientConnection.h
-    src/QServerMainWindow.h
+    src/QServerMainWindow.hpp
     src/QClientConnection.cpp
     src/QServerMainWindow.cpp
     ../common/NetworkMessage.h
