@@ -1,7 +1,7 @@
 #pragma once
 
 #include <QMainWindow>
-#include "QChatlisServer.h"
+#include "QChatlisServer.hpp"
 #include <QGroupBox>
 #include <QTextEdit>
 
@@ -14,7 +14,6 @@ public:
 
 private:
 	QGroupBox* initOutputGroupBox();
-	void displayIpAddresses();
 
 	QTextEdit* mOutputTextEdit{};
 	QChatlisServer mServer;

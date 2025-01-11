@@ -20,7 +20,8 @@ QServerMainWindow::QServerMainWindow()
 	setWindowTitle("Chatlis - Server");
 	setWindowIcon(QIcon(":/images/server.png"));
 	resize(600, 350);
-	connect(&mServer, &QChatlisServer::serverLog, mOutputTextEdit, &QTextEdit::append);
+
+	mServer.start();
 }
 
 QGroupBox* QServerMainWindow::initOutputGroupBox()
@@ -31,43 +32,10 @@ QGroupBox* QServerMainWindow::initOutputGroupBox()
 	groupBox->setLayout(layout);
 
 	mOutputTextEdit = new QTextEdit;
+	layout->addWidget(mOutputTextEdit);
 	mOutputTextEdit->setReadOnly(true);
 	mOutputTextEdit->setLineWrapMode(QTextEdit::NoWrap);
-	layout->addWidget(mOutputTextEdit);
-
-	displayIpAddresses();
+	connect(&mServer, &QChatlisServer::serverLog, mOutputTextEdit, &QTextEdit::append);
 
 	return groupBox;
-}
-
-void QServerMainWindow::displayIpAddresses()
-{
-	QString IPV4Addresses;
-	bool isFirstItem{ true };
-	std::ranges::for_each(QNetworkInterface::allAddresses(), [&IPV4Addresses, &isFirstItem](const QHostAddress& address)
-	{
-		if (address.protocol() == QHostAddress::NetworkLayerProtocol::IPv4Protocol)
-		{
-			if (isFirstItem)
-			{
-				IPV4Addresses += QString("%1").arg(address.toString());
-			}
-			else
-			{
-				IPV4Addresses += QString(" | %1").arg(address.toString());
-			}
-
-			isFirstItem = false;
-		}
-	});
-
-	if (!IPV4Addresses.isEmpty())
-	{
-		mOutputTextEdit->append("Your local ip address(es) : " + IPV4Addresses);
-		mOutputTextEdit->append("Log : server listening on port " + QString::number(QChatlisServer::PORT_NB));
-	}
-	else
-	{
-		mOutputTextEdit->append("No local ip address found.");
-	}
 }

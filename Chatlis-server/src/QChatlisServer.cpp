@@ -1,17 +1,13 @@
-#include "QChatlisServer.h"
+#include "QChatlisServer.hpp"
 #include <QtNetwork>
 #include <QVector>
 #include "QClientInfo.h"
 #include <QPair>
 #include <QSslConfiguration>
 
-const quint16 QChatlisServer::PORT_NB{ 59532 };
-
 QChatlisServer::QChatlisServer()
-	: connectedClients()
 {
 	connect(this, &QTcpServer::pendingConnectionAvailable, this, &QChatlisServer::getNextPendingConnection);
-	listen(QHostAddress::Any, QChatlisServer::PORT_NB);
 }
 
 void QChatlisServer::incomingConnection(qintptr socketDescriptor)
@@ -106,4 +102,40 @@ void QChatlisServer::clientDisconnected()
 	disconnectedClient->deleteLater();
 }
 
-QChatlisServer::~QChatlisServer() {}
+void QChatlisServer::displayIpAddresses()
+{
+	QString IPV4Addresses;
+	bool isFirstItem{ true };
+	std::ranges::for_each(QNetworkInterface::allAddresses(), [&IPV4Addresses, &isFirstItem](const QHostAddress& address)
+	{
+		if (address.protocol() == QHostAddress::NetworkLayerProtocol::IPv4Protocol)
+		{
+			if (isFirstItem)
+			{
+				IPV4Addresses += QString("%1").arg(address.toString());
+			}
+			else
+			{
+				IPV4Addresses += QString(" | %1").arg(address.toString());
+			}
+
+			isFirstItem = false;
+		}
+	});
+
+	if (!IPV4Addresses.isEmpty())
+	{
+		emit serverLog("Your local ip address(es) : " + IPV4Addresses);
+		emit serverLog("Log : server listening on port " + QString::number(QChatlisServer::PORT_NB));
+	}
+	else
+	{
+		emit serverLog("No local ip address found.");
+	}
+}
+
+void QChatlisServer::start()
+{
+	displayIpAddresses();
+	listen(QHostAddress::Any, QChatlisServer::PORT_NB);
+}

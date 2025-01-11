@@ -11,9 +11,10 @@ class QChatlisServer : public QSslServer
 
 public:
     QChatlisServer();
-    ~QChatlisServer();
 
-    const static quint16 PORT_NB;
+    inline static constexpr quint16 PORT_NB{ 59532 };
+
+    void start();
 
 signals:
     void serverLog(const QString& message);
@@ -30,5 +31,7 @@ private slots:
     void getNextPendingConnection();
 
 private:
+    void displayIpAddresses();
+
     QList<QClientConnection*> connectedClients;
 };
