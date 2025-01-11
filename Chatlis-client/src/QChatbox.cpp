@@ -9,10 +9,11 @@
 const QColor QChatbox::SERVER_MESSAGE_TEXT_COLOR{ Qt::gray };
 const QColor QChatbox::USER_MESSAGE_TEXT_COLOR{ Qt::black };
 const QColor QChatbox::SYSTEM_MESSAGE_TEXT_COLOR{ Qt::red };
+const QColor QChatbox::USER_MESSAGE_PING_BG_COLOR{ QColor(0,0,255,50) };
 
 
-QChatbox::QChatbox(QWidget *parent)
-	: QTextEdit(parent)
+QChatbox::QChatbox(const QClientInfo& clientInfo, QWidget* parent)
+    : QTextEdit(parent), clientInfo(clientInfo)
 {
     setFocusPolicy(Qt::NoFocus);
     setReadOnly(true);
@@ -39,12 +40,16 @@ void QChatbox::appendServerMessage(const QString message)
 void QChatbox::appendUserMessage(const QString& from, const QString& message)
 {
     setTextColor(QChatbox::USER_MESSAGE_TEXT_COLOR);
+    if (message.contains(QString("@" + clientInfo.getUsername()))) {
+        setTextBackgroundColor(QChatbox::USER_MESSAGE_PING_BG_COLOR);
+    }
 
     QScrollBar* bar{ verticalScrollBar() };
     bool scrollBarWasAtBottom{ bar->value() == bar->maximum() };
 
     QString toAppend{ "[%1] %2" };
     appendTextWithTime(toAppend.arg(from, message));
+    setTextBackgroundColor(Qt::transparent);
 
     if (scrollBarWasAtBottom)
         bar->setValue(bar->maximum());
