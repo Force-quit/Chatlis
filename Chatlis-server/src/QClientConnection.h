@@ -33,5 +33,6 @@ public slots:
 private:
 	void sendNetworkMessage(const QByteArray& toSend);
 
+
 	QClientInfo client;
 };
