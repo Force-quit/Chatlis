@@ -1,14 +1,10 @@
 #include "QClientInfo.h"
 
-QClientInfo::QClientInfo(bool isLocalClient)
-	: computerName(), username()
+QClientInfo::QClientInfo()
 {
-    if (isLocalClient)
+    if (username.isEmpty())
     {
-        computerName = qEnvironmentVariable("USERDOMAIN");
-        username = qEnvironmentVariable("USERNAME");
-        if (username.isEmpty())
-            username = qEnvironmentVariable("USER");
+        username = qEnvironmentVariable("USER");
     }
 }
 
@@ -22,11 +18,6 @@ void QClientInfo::setComputerName(const QString& newComputerName)
     computerName = newComputerName;
 }
 
-void QClientInfo::setClientId(qint64 newClientId)
-{
-	clientId = newClientId;
-}
-
 QString QClientInfo::getUsername() const
 {
     return username;
@@ -35,9 +26,4 @@ QString QClientInfo::getUsername() const
 QString QClientInfo::getComputerName() const
 {
     return computerName;
-}
-
-qint64 QClientInfo::getClientId() const
-{
-    return clientId;
 }

@@ -20,7 +20,7 @@
 #include "QChatWidget.h"
 
 QChatRoomMainWindow::QChatRoomMainWindow(QWidget* parent)
-	: QMainWindow(parent), localClient(true), userDisplayName{}, participantsPanel{}, chatWidget{ new QChatWidget(this, localClient) }
+	: QMainWindow(parent), userDisplayName{}, participantsPanel{}, chatWidget{ new QChatWidget(this, localClient) }
 {
 	QChatlisMenuBar* topMenuBar{ new QChatlisMenuBar(this) };
 	setMenuBar(topMenuBar);

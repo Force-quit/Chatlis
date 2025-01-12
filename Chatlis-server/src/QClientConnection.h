@@ -2,17 +2,16 @@
 
 #include <QSslSocket>
 #include "QClientInfo.h"
-#include <QList>
-#include <tuple>
+#include <QSpan>
 
 class QClientConnection : public QSslSocket
 {
 	Q_OBJECT
 
 public:
-	QClientConnection(QObject* parent, qintptr socketDescriptor);
+	QClientConnection(qintptr socketDescriptor);
 
-	void replicateExistingClients(const QList<std::tuple<qint64, QString, QString>>& existingClients);
+	void replicateExistingClients(QSpan<QClientConnection*> existingClients);
 	void replicateClientMessage(const QString& clientName, const QString& message);
 	void replicateNewClient(qint64 clientId, const QString& clientName, const QString& computerName);
 	void replicateDisconnect(qint64 clientId, const QString& clientName, const QString& computerName);
@@ -21,8 +20,11 @@ public:
 	QString getClientUsername() const;
 	QString getClientComputerName() const;
 
+	[[nodiscard]] bool wasEncrypted() const { return hasBeenEncrypted; }
+	[[nodiscard]] QString clientAddress() const { return mClientAddress; }
+
 signals:
-	void newClient();
+	void registration();
 	void newClientMessage(const QString message);
 	void clientChangedName();
   
@@ -31,6 +33,7 @@ public slots:
 
 private:
 	void sendNetworkMessage(const QByteArray& toSend);
-
-	QClientInfo client;
+	QClientInfo mClientInfo;
+	QString mClientAddress;
+	bool hasBeenEncrypted{};
 };

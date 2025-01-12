@@ -4,11 +4,9 @@
 #include <QFile>
 #include <QSslKey>
 #include <QSslCertificate>
-#include <tuple>
 #include <QList>
 
-QClientConnection::QClientConnection(QObject* parent, qintptr socketDescriptor)
-	: QSslSocket(parent), client(false)
+QClientConnection::QClientConnection(qintptr socketDescriptor)
 {
 	QFile keyFile("SSL/server.key");
 	keyFile.open(QIODevice::ReadOnly);
@@ -25,22 +23,21 @@ QClientConnection::QClientConnection(QObject* parent, qintptr socketDescriptor)
 	setSocketDescriptor(socketDescriptor);
 	startServerEncryption();
 
+	mClientAddress = QHostAddress(peerAddress().toIPv4Address()).toString();
+
 	connect(this, &QClientConnection::readyRead, this, &QClientConnection::receivedData);
+	connect(this, &QClientConnection::encrypted, [this]() {hasBeenEncrypted = true; });
 }
 
-void QClientConnection::replicateExistingClients(const QList<std::tuple<qint64, QString, QString>>& existingClients)
+void QClientConnection::replicateExistingClients(QSpan<QClientConnection*> existingClients)
 {
 	QByteArray byteArray;
 	QDataStream dataStream(&byteArray, QIODevice::WriteOnly);
 	dataStream << NetworkMessage::Type::replicateExistingClients;
 
-	for (auto& clientInfo : existingClients)
+	for (const QClientConnection* existingClient : existingClients)
 	{
-		qint64 clientId;
-		QString clientName;
-		QString computerName;
-		std::tie(clientId, clientName, computerName) = clientInfo;
-		dataStream << clientId << clientName << computerName;
+		dataStream << existingClient->socketDescriptor() << existingClient->getClientUsername() << existingClient->getClientComputerName();
 	}
 
 	sendNetworkMessage(byteArray);
@@ -83,12 +80,12 @@ void QClientConnection::replicateClientChangedName(qint64 clientId, const QStrin
 
 QString QClientConnection::getClientUsername() const
 {
-	return client.getUsername();
+	return mClientInfo.getUsername();
 }
 
 QString QClientConnection::getClientComputerName() const
 {
-	return client.getComputerName();
+	return mClientInfo.getComputerName();
 }
 
 void QClientConnection::receivedData()
@@ -101,8 +98,8 @@ void QClientConnection::receivedData()
 	NetworkMessage::Type messageType{};
 	processedData >> messageType;
 
-	QString previousComputerName(client.getComputerName());
-	QString previousUsername(client.getUsername());
+	QString previousComputerName(mClientInfo.getComputerName());
+	QString previousUsername(mClientInfo.getUsername());
 
 	QString username;
 	QString computerName;
@@ -116,15 +113,15 @@ void QClientConnection::receivedData()
 	case NetworkMessage::Type::clientRegistration:
 		processedData >> username;
 		processedData >> computerName;
-		client.setUsername(username);
-		client.setComputerName(computerName);
-		emit newClient();
+		mClientInfo.setUsername(username);
+		mClientInfo.setComputerName(computerName);
+		emit registration();
 		break;
 	case NetworkMessage::Type::clientChangedName:
 		processedData >> username;
 		processedData >> computerName;
-		client.setUsername(username);
-		client.setComputerName(computerName);
+		mClientInfo.setUsername(username);
+		mClientInfo.setComputerName(computerName);
 		emit clientChangedName();
 		break;
 	case NetworkMessage::Type::clientSentMessage:

@@ -29,9 +29,6 @@ private slots:
 
 private:
     inline static constexpr quint16 PORT_NB{ 59532 };
-
-	quint16 mNextClientID{};
     void displayIpAddresses();
-
     QList<QClientConnection*> mConnectedClients;
 };

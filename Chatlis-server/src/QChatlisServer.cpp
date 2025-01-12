@@ -11,36 +11,33 @@ QChatlisServer::QChatlisServer()
 
 void QChatlisServer::incomingConnection(qintptr socketDescriptor)
 {
-	addPendingConnection(new QClientConnection(this, socketDescriptor));
+	addPendingConnection(new QClientConnection(socketDescriptor));
 }
 
 void QChatlisServer::getNextPendingConnection()
 {
 	QClientConnection* newClient{ dynamic_cast<QClientConnection*>(nextPendingConnection()) };
 
-	connect(newClient, &QClientConnection::newClient, this, &QChatlisServer::replicateNewUser);
+	connect(newClient, &QClientConnection::registration, this, &QChatlisServer::replicateNewUser);
 	connect(newClient, &QClientConnection::newClientMessage, this, &QChatlisServer::replicateClientMessage);
 	connect(newClient, &QClientConnection::clientChangedName, this, &QChatlisServer::replicateClientChangedName);
 	connect(newClient, &QAbstractSocket::disconnected, this, &QChatlisServer::clientDisconnected);
-
-	if (mConnectedClients.size() > 0)
+	
+	if (!mConnectedClients.isEmpty())
 	{
-		QList<std::tuple<qint64, QString, QString>> existingClients;
-		std::ranges::transform(mConnectedClients, std::back_inserter(existingClients), [&existingClients](const QClientConnection* localClient)
-		{
-			return std::tuple{localClient->socketDescriptor(), localClient->getClientUsername(), localClient->getClientComputerName() };
-		});
-		newClient->replicateExistingClients(existingClients);
+		newClient->replicateExistingClients(mConnectedClients);
 	}
-
+	
 	mConnectedClients.append(newClient);
+
+	emit serverLog("Client attempting to connect from " + newClient->clientAddress());
 }
 
 void QChatlisServer::replicateNewUser()
 {
 	QClientConnection* newClient{ dynamic_cast<QClientConnection*>(sender()) };
 	
-	QString log("Log : connection opened with client %1@%2 from %3");
+	QString log("Connection opened with client %1@%2 from %3");
 	const QString& username(newClient->getClientUsername());
 	const QString& computerName(newClient->getClientComputerName());
 	QString peerAddress(QHostAddress(newClient->peerAddress().toIPv4Address()).toString());
@@ -83,23 +80,23 @@ void QChatlisServer::clientDisconnected()
 {
 	QClientConnection* disconnectedClient{ dynamic_cast<QClientConnection*>(sender()) };
 	
-	const QString& username = disconnectedClient->getClientUsername();
-	const QString& computerName = disconnectedClient->getClientComputerName();
-
-	QString log("Log : connection closed with client [%1] (%2)");
-	QHostAddress formated(disconnectedClient->peerAddress().toIPv4Address());
-	emit serverLog(log.arg(username, formated.toString()));
-
-	std::ranges::for_each(mConnectedClients, [disconnectedClient](QClientConnection* client)
-	{
-		if (client != disconnectedClient)
-		{
-			client->replicateDisconnect(disconnectedClient->socketDescriptor(), disconnectedClient->getClientUsername(), disconnectedClient->getClientComputerName());
-		}
-	});
-
 	mConnectedClients.removeOne(disconnectedClient);
 	disconnectedClient->deleteLater();
+
+	if (disconnectedClient->wasEncrypted())
+	{
+		QString log("Connection closed with client %1@%2 from %3");
+		emit serverLog(log.arg(disconnectedClient->getClientUsername(), disconnectedClient->getClientComputerName(), disconnectedClient->clientAddress()));
+
+		std::ranges::for_each(mConnectedClients, [disconnectedClient](QClientConnection* client)
+		{
+			client->replicateDisconnect(disconnectedClient->socketDescriptor(), disconnectedClient->getClientUsername(), disconnectedClient->getClientComputerName());
+		});
+	}
+	else
+	{
+		emit serverLog("Connection closed with unencrypted client at " + disconnectedClient->clientAddress());
+	}
 }
 
 void QChatlisServer::displayIpAddresses()
@@ -126,11 +123,11 @@ void QChatlisServer::displayIpAddresses()
 	if (!IPV4Addresses.isEmpty())
 	{
 		emit serverLog("Your local ip address(es) : " + IPV4Addresses);
-		emit serverLog("Log : server listening on port " + QString::number(QChatlisServer::PORT_NB));
+		emit serverLog("Server listening on port " + QString::number(QChatlisServer::PORT_NB) + '\n');
 	}
 	else
 	{
-		emit serverLog("No local ip address found.");
+		emit serverLog("No local ip address found.\n");
 	}
 }
 
