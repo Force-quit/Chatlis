@@ -51,5 +51,3 @@ void QChatWidget::clearMessages()
 {
 	chatBox->clear();
 }
-
-QChatWidget::~QChatWidget() {}

@@ -54,5 +54,3 @@ void QChatbox::appendUserMessage(const QString& from, const QString& message)
     if (scrollBarWasAtBottom)
         bar->setValue(bar->maximum());
 }
-
-QChatbox::~QChatbox() {}

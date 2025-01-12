@@ -1,23 +1,30 @@
 #pragma once
 
-#include <QListView>
-#include <QStringListModel>
+#include <QScrollArea>
+#include <QList>
+#include "QParticipantLabel.hpp"
 
-class QParticipantsPanel : public QListView
+class QParticipantsPanel : public QScrollArea
 {
 	Q_OBJECT
 
 public:
-	QParticipantsPanel(QWidget *parent = nullptr);
-	~QParticipantsPanel();
+	QParticipantsPanel();
 
 public slots:
-	void addParticipant(const QString participantName, const QString participantComputerName);
-	void removeParticipant(const QString participantName, const QString participantComputerName);
-	void otherClientChangedUsername(const QString previousUsername, const QString computerName, const QString newUsername);
-	void otherClientChangedComputerName(const QString username, const QString previousComputerName, const QString newComputerName);
+	void addClient(qint64 clientId, QStringView clientName, QStringView clientComputerName);
+	void removeClient(qint64 clientId);
+	void clientNameChanged(qint64 clientId, QStringView clientName, QStringView clientComputerName);
 	void clear();
 
 private:
-	QStringListModel* model;
+	auto findClientLabel(qint64 clientId) const
+	{
+		return std::ranges::find_if(mParticipants, [clientId](const QParticipantLabel* participant)
+		{
+			return participant->clientId() == clientId;
+		});
+	}
+
+	QList<QParticipantLabel*> mParticipants;
 };

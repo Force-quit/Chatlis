@@ -12,6 +12,7 @@ set(CLIENT_SOURCE
     src/QParticipantsPanel.h
     src/QServerConnection.cpp
     src/QServerConnection.h
+    src/QParticipantLabel.hpp
 
     ../common/NetworkMessage.h
     ../common/QClientInfo.h

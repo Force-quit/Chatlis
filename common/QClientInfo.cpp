@@ -22,6 +22,11 @@ void QClientInfo::setComputerName(const QString& newComputerName)
     computerName = newComputerName;
 }
 
+void QClientInfo::setClientId(qint64 newClientId)
+{
+	clientId = newClientId;
+}
+
 QString QClientInfo::getUsername() const
 {
     return username;
@@ -32,4 +37,7 @@ QString QClientInfo::getComputerName() const
     return computerName;
 }
 
-QClientInfo::~QClientInfo() {}
+qint64 QClientInfo::getClientId() const
+{
+    return clientId;
+}

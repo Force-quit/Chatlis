@@ -11,7 +11,6 @@ class QChatWidget : public QWidget
 
 public:
 	QChatWidget(QWidget* parent, const QClientInfo& clientInfo);
-	~QChatWidget();
 
 	void clearMessages();
 

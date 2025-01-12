@@ -16,7 +16,6 @@ class QChatRoomMainWindow : public QMainWindow
 
 public:
 	QChatRoomMainWindow(QWidget *parent = nullptr);
-	~QChatRoomMainWindow();
 
 private slots:
 	void actionConnectToServer();
@@ -25,9 +24,9 @@ private slots:
 	void actionChangeComputerName();
 
 private:
-	QClientInfo client;
+	QClientInfo localClient;
+	QServerConnection serverConnection;
 
-	QServerConnection* serverConnection;
 	QLabel* userDisplayName;
 	QParticipantsPanel* participantsPanel;
 	QChatWidget* chatWidget;

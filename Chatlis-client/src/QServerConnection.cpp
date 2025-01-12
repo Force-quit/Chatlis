@@ -2,7 +2,6 @@
 #include <QHostAddress>
 #include <QDataStream>
 #include <QByteArray>
-#include <QThread>
 #include "NetworkMessage.h"
 #include <QFile>
 #include <QSslKey>
@@ -10,8 +9,7 @@
 #include <QSslConfiguration>
 #include <QTimer>
 
-QServerConnection::QServerConnection(QObject* parent)
-	: QSslSocket(parent)
+QServerConnection::QServerConnection()
 {
 	auto caCerts = QSslCertificate::fromPath("SSL/ca/*.pem", QSsl::Pem, QSslCertificate::PatternSyntax::Wildcard);
 	Q_ASSERT(!caCerts.isEmpty());
@@ -32,64 +30,69 @@ QServerConnection::QServerConnection(QObject* parent)
 
 void QServerConnection::connectToServer(const QString& address, const QString& portNb, const QString& username, const QString& computerName)
 {
+	if (address.isEmpty() || portNb.isEmpty())
+	{
+		return;
+	}
+
 	if (isEncrypted())
 	{
 		disconnectFromHost();
 		waitForDisconnected(5000);
 	}
 
-	if (!address.isEmpty()) 
+	connectToHostEncrypted(address, portNb.toUInt());
+	emit appendSystemMessage("Connecting to " + address + ':' + portNb);
+	if (waitForConnected(10000)) 
 	{
-		connectToHostEncrypted(address, portNb.toUInt());
-		emit appendSystemMessage("Connecting to " + address + ':' + portNb);
-		if (waitForConnected(10000)) 
+		emit appendSystemMessage("Connected to " + address + ':' + portNb);
+		emit appendSystemMessage("Trying to set up encryption");
+		if (waitForEncrypted(10000)) 
 		{
-			emit appendSystemMessage("Connected to " + address + ':' + portNb);
-			emit appendSystemMessage("Trying to set up encryption");
-			if (waitForEncrypted(10000)) 
-			{
-				emit appendSystemMessage("Encrypted connection established");
-				QByteArray buffer;
-				QDataStream dataStream(&buffer, QIODevice::WriteOnly);
-				dataStream << NetworkMessage::Type::clientRegistration << username << computerName;
-
-				QDataStream dataToSend(this);
-				dataToSend << buffer;
-			}
-			else 
-			{
-				emit appendSystemMessage("Encryption failed. Disconnecting");
-				disconnectFromHost();
-			}
+			emit appendSystemMessage("Encrypted connection established");
+			registration(username, computerName);
 		}
 		else 
-			emit appendSystemMessage("Connection failed");
+		{
+			emit appendSystemMessage("Encryption failed. Disconnecting");
+			disconnectFromHost();
+		}
+	}
+	else
+	{
+		emit appendSystemMessage("Connection failed");
 	}
 }
 
 void QServerConnection::sendNewChatMessage(const QString& message)
 {
-	QByteArray buffer;
-	QDataStream dataStream(&buffer, QIODevice::WriteOnly);
-	dataStream << NetworkMessage::Type::clientSentMessage << message;
-	QDataStream dataToSend(this);
-	dataToSend << buffer;
+	if (isEncrypted())
+	{
+		QByteArray buffer;
+		QDataStream dataStream(&buffer, QIODevice::WriteOnly);
+		dataStream << NetworkMessage::Type::clientSentMessage << message;
+		QDataStream dataToSend(this);
+		dataToSend << buffer;
+	}
 }
 
-void QServerConnection::changeUserName(const QString& newUsername)
+void QServerConnection::changeName(const QString& name, const QString& computerName)
+{
+	if (isEncrypted())
+	{
+		QByteArray buffer;
+		QDataStream dataStream(&buffer, QIODevice::WriteOnly);
+		dataStream << NetworkMessage::Type::clientChangedName << name << computerName;
+		QDataStream dataToSend(this);
+		dataToSend << buffer;
+	}
+}
+
+void QServerConnection::registration(const QString& name, const QString& computerName)
 {
 	QByteArray buffer;
 	QDataStream dataStream(&buffer, QIODevice::WriteOnly);
-	dataStream << NetworkMessage::Type::clientChangeUsername << newUsername;
-	QDataStream dataToSend(this);
-	dataToSend << buffer;
-}
-
-void QServerConnection::changeComputerName(const QString& newComputerName)
-{
-	QByteArray buffer;
-	QDataStream dataStream(&buffer, QIODevice::WriteOnly);
-	dataStream << NetworkMessage::Type::clientChangeComputerName << newComputerName;
+	dataStream << NetworkMessage::Type::clientRegistration << name << computerName;
 	QDataStream dataToSend(this);
 	dataToSend << buffer;
 }
@@ -106,50 +109,49 @@ void QServerConnection::receivedData()
 
 	QString previousUsername;
 	QString previousComputerName;
-	QString username;
+	QString name;
 	QString computerName;
 	QString message;
+	qint64 clientId;
+	QString formattedMessage;
 
 	switch (messageType)
 	{
 		case NetworkMessage::Type::clientSentMessage:
-			processedData >> username;
+			processedData >> name;
 			processedData >> message;
-			emit addMessageToChatbox(username, message);
+			emit addMessageToChatbox(name, message);
 			break;
 		case NetworkMessage::Type::replicateExistingClients:
 			while (!processedData.atEnd())
 			{
-				processedData >> username;
+				processedData >> clientId;
+				processedData >> name;
 				processedData >> computerName;
-				emit newClient(username, computerName);
+				emit newClient(clientId, name, computerName);
 			}
 			break;
 		case NetworkMessage::Type::clientAdded:
-			processedData >> username;
+			processedData >> clientId;
+			processedData >> name;
 			processedData >> computerName;
-			emit appendServerMessage(username + " has joined the server");
-			emit newClient(username, computerName);
+			emit appendServerMessage(name + " has joined the server");
+			emit newClient(clientId, name, computerName);
 			break;
-		case NetworkMessage::Type::clientChangeUsername:
-			processedData >> previousUsername;
+		case NetworkMessage::Type::clientChangedName:
+			processedData >> clientId;
+			processedData >> name;
 			processedData >> computerName;
-			processedData >> username;
-			emit otherClientChangedUsername(previousUsername, computerName, username);
-			emit appendServerMessage(previousUsername + '@' + computerName + " changed their name to " + username + '@' + computerName);
-			break;
-		case NetworkMessage::Type::clientChangeComputerName :
-			processedData >> username;
-			processedData >> previousComputerName;
-			processedData >> computerName;
-			emit otherClientChangedComputerName(username, previousComputerName, computerName);
-			emit appendServerMessage(username + '@' + previousComputerName + " changed their name to " + username + '@' + computerName);
+			emit clientChangedName(clientId, name, computerName);
+			formattedMessage = QString("Client %1 changed their name to %2@%3").arg(QString::number(clientId), name, computerName);
+			emit appendServerMessage(formattedMessage);
 			break;
 		case NetworkMessage::Type::clientDisconnected:
-			processedData >> username;
+			processedData >> clientId;
+			processedData >> name;
 			processedData >> computerName;
-			emit removeClient(username, computerName);
-			emit appendServerMessage(username + " has left the server");
+			emit removeClient(clientId);
+			emit appendServerMessage(name + " has left the server");
 			break;
 		default:
 			break;

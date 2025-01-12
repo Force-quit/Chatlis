@@ -20,16 +20,15 @@ void QChatlisServer::getNextPendingConnection()
 
 	connect(newClient, &QClientConnection::newClient, this, &QChatlisServer::replicateNewUser);
 	connect(newClient, &QClientConnection::newClientMessage, this, &QChatlisServer::replicateClientMessage);
-	connect(newClient, &QClientConnection::newClientName, this, &QChatlisServer::replicateClientNewUsername);
-	connect(newClient, &QClientConnection::newClientComputerName, this, &QChatlisServer::replicateClientNewComputerName);
+	connect(newClient, &QClientConnection::clientChangedName, this, &QChatlisServer::replicateClientChangedName);
 	connect(newClient, &QAbstractSocket::disconnected, this, &QChatlisServer::clientDisconnected);
 
 	if (mConnectedClients.size() > 0)
 	{
-		QList<QPair<QString, QString>> existingClients;
-		std::ranges::transform(mConnectedClients, std::back_inserter(existingClients), [&existingClients](const QClientConnection* client)
+		QList<std::tuple<qint64, QString, QString>> existingClients;
+		std::ranges::transform(mConnectedClients, std::back_inserter(existingClients), [&existingClients](const QClientConnection* localClient)
 		{
-			return std::pair{ client->getClientUsername(), client->getClientComputerName() };
+			return std::tuple{localClient->socketDescriptor(), localClient->getClientUsername(), localClient->getClientComputerName() };
 		});
 		newClient->replicateExistingClients(existingClients);
 	}
@@ -41,40 +40,33 @@ void QChatlisServer::replicateNewUser()
 {
 	QClientConnection* newClient{ dynamic_cast<QClientConnection*>(sender()) };
 	
-	QString log("Log : connection opened with client %1@%2 %3:%4 at local port %5");
+	QString log("Log : connection opened with client %1@%2 from %3");
 	const QString& username(newClient->getClientUsername());
 	const QString& computerName(newClient->getClientComputerName());
 	QString peerAddress(QHostAddress(newClient->peerAddress().toIPv4Address()).toString());
-	QString peerPort(newClient->peerPort());
-	QString localPort(newClient->localPort());
-	emit serverLog(log.arg(username, computerName, peerAddress, peerPort, localPort));
+	emit serverLog(log.arg(username, computerName, peerAddress));
 
-	// Use QClientconnection local port to get a unique identifier for the client
-	for (QClientConnection* client : mConnectedClients)
+	// Use QClientconnection local port to get a unique identifier for the localClient
+	for (QClientConnection* localClient : mConnectedClients)
 	{
-		if (client != newClient)
+		if (localClient != newClient)
 		{
-			client->replicateNewClient(username, computerName);
+			localClient->replicateNewClient(newClient->socketDescriptor(), username, computerName);
 		}
 	}
 }
 
-void QChatlisServer::replicateClientNewUsername(const QString previousUsername)
+void QChatlisServer::replicateClientChangedName()
 {
-	QClientConnection* senderConnection{ dynamic_cast<QClientConnection*>(sender()) };
+	QClientConnection* initiatorClient{ dynamic_cast<QClientConnection*>(sender()) };
 
-	for (QClientConnection* client : mConnectedClients)
-		if (client != senderConnection)
-			client->replicateClientNewUsername(previousUsername, senderConnection->getClientComputerName(), senderConnection->getClientUsername());
-}
-
-void QChatlisServer::replicateClientNewComputerName(const QString previousComputerName)
-{
-	QClientConnection* senderConnection{ dynamic_cast<QClientConnection*>(sender()) };
-
-	for (QClientConnection* client : mConnectedClients)
-		if (client != senderConnection)
-			client->replicateClientNewComputerName(senderConnection->getClientUsername(), previousComputerName, senderConnection->getClientComputerName());
+	std::ranges::for_each(mConnectedClients, [initiatorClient](QClientConnection* client)
+	{
+		if (client != initiatorClient)
+		{
+			client->replicateClientChangedName(initiatorClient->socketDescriptor(), initiatorClient->getClientUsername(), initiatorClient->getClientComputerName());
+		}
+	});
 }
 
 void QChatlisServer::replicateClientMessage(const QString message)
@@ -82,28 +74,29 @@ void QChatlisServer::replicateClientMessage(const QString message)
 	QClientConnection* senderConnection{ dynamic_cast<QClientConnection*>(sender()) };
 	const QString& username = senderConnection->getClientUsername();
 
-	for (QClientConnection* client : mConnectedClients)
-		if (client != senderConnection)
-			client->replicateClientMessage(username, message);
+	for (QClientConnection* localClient : mConnectedClients)
+		if (localClient != senderConnection)
+			localClient->replicateClientMessage(username, message);
 }
 
 void QChatlisServer::clientDisconnected()
 {
 	QClientConnection* disconnectedClient{ dynamic_cast<QClientConnection*>(sender()) };
 	
-	if (disconnectedClient->isEncrypted())
+	const QString& username = disconnectedClient->getClientUsername();
+	const QString& computerName = disconnectedClient->getClientComputerName();
+
+	QString log("Log : connection closed with client [%1] (%2)");
+	QHostAddress formated(disconnectedClient->peerAddress().toIPv4Address());
+	emit serverLog(log.arg(username, formated.toString()));
+
+	std::ranges::for_each(mConnectedClients, [disconnectedClient](QClientConnection* client)
 	{
-		const QString& username = disconnectedClient->getClientUsername();
-		const QString& computerName = disconnectedClient->getClientComputerName();
-
-		QString log("Log : connection closed with client [%1] (%2)");
-		QHostAddress formated(disconnectedClient->peerAddress().toIPv4Address());
-		emit serverLog(log.arg(username, formated.toString()));
-
-		for (QClientConnection* client : mConnectedClients)
-			if (client != disconnectedClient)
-				client->replicateDisconnect(username, computerName);
-	}
+		if (client != disconnectedClient)
+		{
+			client->replicateDisconnect(disconnectedClient->socketDescriptor(), disconnectedClient->getClientUsername(), disconnectedClient->getClientComputerName());
+		}
+	});
 
 	mConnectedClients.removeOne(disconnectedClient);
 	disconnectedClient->deleteLater();

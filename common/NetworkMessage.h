@@ -9,8 +9,7 @@ struct NetworkMessage
 		clientAdded,
 		replicateExistingClients,
 		clientDisconnected,
-		clientChangeUsername,
-		clientChangeComputerName,
+		clientChangedName,
 		clientSentMessage
 	};
 };

@@ -8,7 +8,6 @@ class QChatlisMenuBar : public QMenuBar
 
 public:
 	QChatlisMenuBar(QWidget *parent = nullptr);
-	~QChatlisMenuBar();
 
 public slots:
 

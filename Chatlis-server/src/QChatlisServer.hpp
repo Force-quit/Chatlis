@@ -24,13 +24,13 @@ private slots:
     void clientDisconnected();
     void replicateClientMessage(const QString message);
     void replicateNewUser();
-    void replicateClientNewUsername(const QString previousUsername);
-    void replicateClientNewComputerName(const QString previousComputerName);
+    void replicateClientChangedName();
     void getNextPendingConnection();
 
 private:
     inline static constexpr quint16 PORT_NB{ 59532 };
 
+	quint16 mNextClientID{};
     void displayIpAddresses();
 
     QList<QClientConnection*> mConnectedClients;

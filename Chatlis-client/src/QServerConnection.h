@@ -11,12 +11,12 @@ class QServerConnection  : public QSslSocket
 	Q_OBJECT
 
 public:
-	QServerConnection(QObject *parent);
+	QServerConnection();
 	~QServerConnection();
 
 	void connectToServer(const QString& address, const QString& portNb, const QString& username, const QString& computerName);
-	void changeUserName(const QString& newUsername);
-	void changeComputerName(const QString& newComputerName);
+	void changeName(const QString& name, const QString& computerName);
+	void registration(const QString& name, const QString& computerName);
 
 public slots:
 	void sendNewChatMessage(const QString& message);
@@ -24,12 +24,11 @@ public slots:
 signals:
 	void clearChatbox();
 	void addMessageToChatbox(const QString username, const QString message);
-	void newClient(const QString username, const QString computerName);
-	void removeClient(const QString username, const QString computerName);
+	void newClient(qint64 clientId, QStringView username, QStringView computerName);
+	void removeClient(qint64 clientId);
 	void appendSystemMessage(const QString message);
 	void appendServerMessage(const QString message);
-	void otherClientChangedUsername(const QString previousUsername, const QString computerName, const QString newUsername);
-	void otherClientChangedComputerName(const QString username, const QString previousComputerName, const QString newComputerName);
+	void clientChangedName(qint64 clientId, QStringView username, QStringView computerName);
 	void serverDisconnected();
 
 private slots:

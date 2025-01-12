@@ -20,8 +20,7 @@
 #include "QChatWidget.h"
 
 QChatRoomMainWindow::QChatRoomMainWindow(QWidget* parent)
-	: QMainWindow(parent), client(true), serverConnection{ new QServerConnection(this) }, 
-	userDisplayName{}, participantsPanel{}, chatWidget{ new QChatWidget(this, client) }
+	: QMainWindow(parent), localClient(true), userDisplayName{}, participantsPanel{}, chatWidget{ new QChatWidget(this, localClient) }
 {
 	QChatlisMenuBar* topMenuBar{ new QChatlisMenuBar(this) };
 	setMenuBar(topMenuBar);
@@ -42,17 +41,16 @@ QChatRoomMainWindow::QChatRoomMainWindow(QWidget* parent)
 	connect(topMenuBar, &QChatlisMenuBar::actionChangeUsername, this, &QChatRoomMainWindow::actionChangeUsername);
 	connect(topMenuBar, &QChatlisMenuBar::actionChangeComputerName, this, &QChatRoomMainWindow::actionChangeComputerName);
 
-	connect(serverConnection, &QServerConnection::appendSystemMessage, chatWidget, &QChatWidget::appendSystemMessage);
-	connect(serverConnection, &QServerConnection::addMessageToChatbox, chatWidget, &QChatWidget::appendUserMessage);
-	connect(serverConnection, &QServerConnection::appendServerMessage, chatWidget, &QChatWidget::appendServerMessage);
-	connect(chatWidget, &QChatWidget::sendMessage, serverConnection, &QServerConnection::sendNewChatMessage);
+	connect(&serverConnection, &QServerConnection::appendSystemMessage, chatWidget, &QChatWidget::appendSystemMessage);
+	connect(&serverConnection, &QServerConnection::addMessageToChatbox, chatWidget, &QChatWidget::appendUserMessage);
+	connect(&serverConnection, &QServerConnection::appendServerMessage, chatWidget, &QChatWidget::appendServerMessage);
+	connect(chatWidget, &QChatWidget::sendMessage, &serverConnection, &QServerConnection::sendNewChatMessage);
 
 
-	connect(serverConnection, &QServerConnection::newClient, participantsPanel, &QParticipantsPanel::addParticipant);
-	connect(serverConnection, &QServerConnection::serverDisconnected, participantsPanel, &QParticipantsPanel::clear);
-	connect(serverConnection, &QServerConnection::otherClientChangedUsername, participantsPanel, &QParticipantsPanel::otherClientChangedUsername);
-	connect(serverConnection, &QServerConnection::otherClientChangedComputerName, participantsPanel, &QParticipantsPanel::otherClientChangedComputerName);
-	connect(serverConnection, &QServerConnection::removeClient, participantsPanel, &QParticipantsPanel::removeParticipant);
+	connect(&serverConnection, &QServerConnection::newClient, participantsPanel, &QParticipantsPanel::addClient);
+	connect(&serverConnection, &QServerConnection::serverDisconnected, participantsPanel, &QParticipantsPanel::clear);
+	connect(&serverConnection, &QServerConnection::clientChangedName, participantsPanel, &QParticipantsPanel::clientNameChanged);
+	connect(&serverConnection, &QServerConnection::removeClient, participantsPanel, &QParticipantsPanel::removeClient);
 
 }
 
@@ -65,7 +63,7 @@ void QChatRoomMainWindow::actionConnectToServer()
 		if (ipAndPort.size() == 2 && !ipAndPort[0].isEmpty() && !ipAndPort[1].isEmpty())
 		{
 			chatWidget->clearMessages();
-			serverConnection->connectToServer(ipAndPort[0], ipAndPort[1], client.getUsername(), client.getComputerName());
+			serverConnection.connectToServer(ipAndPort[0], ipAndPort[1], localClient.getUsername(), localClient.getComputerName());
 		}
 		else
 			QMessageBox::critical(this, "Wrong format", "Address and port of Chatlis server should be XXX.XXX.XXX.XXX:PPPPP");
@@ -74,7 +72,7 @@ void QChatRoomMainWindow::actionConnectToServer()
 
 void QChatRoomMainWindow::actionDisconnectFromServer()
 {
-	serverConnection->disconnectFromHost();
+	serverConnection.disconnectFromHost();
 }
 
 void QChatRoomMainWindow::actionChangeUsername()
@@ -83,12 +81,14 @@ void QChatRoomMainWindow::actionChangeUsername()
 	if (!newUsername.isEmpty())
 	{
 		if (newUsername.size() > 20)
+		{
 			QMessageBox::critical(this, "Username too long", "Displayed username can't be longer than 20");
+		}
 		else
 		{
-			client.setUsername(newUsername);
-			serverConnection->changeUserName(newUsername);
-			userDisplayName->setText(newUsername + '@' + client.getComputerName());
+			localClient.setUsername(newUsername);
+			serverConnection.changeName(newUsername, localClient.getComputerName());
+			userDisplayName->setText(newUsername + '@' + localClient.getComputerName());
 		}
 	}
 }
@@ -102,9 +102,9 @@ void QChatRoomMainWindow::actionChangeComputerName()
 			QMessageBox::critical(this, "Computer name too long", "Displayed computer name can't be longer than 20");
 		else
 		{
-			client.setComputerName(newComputerName);
-			serverConnection->changeComputerName(newComputerName);
-			userDisplayName->setText(client.getUsername() + '@' + newComputerName);
+			localClient.setComputerName(newComputerName);
+			serverConnection.changeName(localClient.getUsername(), newComputerName);
+			userDisplayName->setText(localClient.getUsername() + '@' + newComputerName);
 		}
 	}
 }
@@ -119,7 +119,7 @@ QWidget* QChatRoomMainWindow::initParticipantsWidget()
 
 	QGroupBox* userDisplayNameGroupBox{ new QGroupBox("Your name") };
 	QVBoxLayout* userDisplayNameLayout{ new QVBoxLayout };
-	userDisplayName = new QLabel(client.getUsername() + '@' + client.getComputerName());
+	userDisplayName = new QLabel(localClient.getUsername() + '@' + localClient.getComputerName());
 	userDisplayNameLayout->addWidget(userDisplayName);
 	userDisplayNameGroupBox->setLayout(userDisplayNameLayout);
 
@@ -133,9 +133,4 @@ QWidget* QChatRoomMainWindow::initParticipantsWidget()
 	usersLayout->addWidget(participantsGroupBox);
 	usersWidget->setLayout(usersLayout);
 	return usersWidget;
-}
-
-QChatRoomMainWindow::~QChatRoomMainWindow()
-{
-	delete serverConnection;
 }

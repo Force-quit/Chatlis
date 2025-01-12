@@ -4,6 +4,8 @@
 #include <QFile>
 #include <QSslKey>
 #include <QSslCertificate>
+#include <tuple>
+#include <QList>
 
 QClientConnection::QClientConnection(QObject* parent, qintptr socketDescriptor)
 	: QSslSocket(parent), client(false)
@@ -26,14 +28,20 @@ QClientConnection::QClientConnection(QObject* parent, qintptr socketDescriptor)
 	connect(this, &QClientConnection::readyRead, this, &QClientConnection::receivedData);
 }
 
-void QClientConnection::replicateExistingClients(const QList<QPair<QString, QString>>& existingClients)
+void QClientConnection::replicateExistingClients(const QList<std::tuple<qint64, QString, QString>>& existingClients)
 {
 	QByteArray byteArray;
 	QDataStream dataStream(&byteArray, QIODevice::WriteOnly);
 	dataStream << NetworkMessage::Type::replicateExistingClients;
 
 	for (auto& clientInfo : existingClients)
-		dataStream << clientInfo.first << clientInfo.second;
+	{
+		qint64 clientId;
+		QString clientName;
+		QString computerName;
+		std::tie(clientId, clientName, computerName) = clientInfo;
+		dataStream << clientId << clientName << computerName;
+	}
 
 	sendNetworkMessage(byteArray);
 }
@@ -47,38 +55,28 @@ void QClientConnection::replicateClientMessage(const QString& clientName, const 
 	sendNetworkMessage(byteArray);
 }
 
-void QClientConnection::replicateNewClient(const QString& clientName, const QString& computerName)
+void QClientConnection::replicateNewClient(qint64 clientId, const QString& clientName, const QString& computerName)
 {
 	QByteArray byteArray;
 	QDataStream dataStream(&byteArray, QIODevice::WriteOnly);
-	dataStream << NetworkMessage::Type::clientAdded << clientName << computerName;
+	dataStream << NetworkMessage::Type::clientAdded << clientId << clientName << computerName;
 
 	sendNetworkMessage(byteArray);
 }
 
-void QClientConnection::replicateDisconnect(const QString& clientName, const QString& computerName)
+void QClientConnection::replicateDisconnect(qint64 clientId, const QString& clientName, const QString& computerName)
 {
 	QByteArray byteArray;
 	QDataStream dataStream(&byteArray, QIODevice::WriteOnly);
-	dataStream << NetworkMessage::Type::clientDisconnected << clientName << computerName;
-
+	dataStream << NetworkMessage::Type::clientDisconnected << clientId << clientName << computerName;
 	sendNetworkMessage(byteArray);
 }
 
-void QClientConnection::replicateClientNewUsername(const QString previousUsername, const QString computerName, const QString newUsername)
+void QClientConnection::replicateClientChangedName(qint64 clientId, const QString& clientName, const QString& clientComputerName)
 {
 	QByteArray byteArray;
 	QDataStream dataStream(&byteArray, QIODevice::WriteOnly);
-	dataStream << NetworkMessage::Type::clientChangeUsername << previousUsername << computerName << newUsername;
-
-	sendNetworkMessage(byteArray);
-}
-
-void QClientConnection::replicateClientNewComputerName(const QString username, const QString previousComputerName, const QString newComputerName)
-{
-	QByteArray byteArray;
-	QDataStream dataStream(&byteArray, QIODevice::WriteOnly);
-	dataStream << NetworkMessage::Type::clientChangeComputerName << username << previousComputerName << newComputerName;
+	dataStream << NetworkMessage::Type::clientChangedName << clientId << clientName << clientComputerName;
 
 	sendNetworkMessage(byteArray);
 }
@@ -122,15 +120,12 @@ void QClientConnection::receivedData()
 		client.setComputerName(computerName);
 		emit newClient();
 		break;
-	case NetworkMessage::Type::clientChangeUsername:
+	case NetworkMessage::Type::clientChangedName:
 		processedData >> username;
-		client.setUsername(username);
-		emit newClientName(previousUsername);
-		break;
-	case NetworkMessage::Type::clientChangeComputerName:
 		processedData >> computerName;
+		client.setUsername(username);
 		client.setComputerName(computerName);
-		emit newClientComputerName(previousComputerName);
+		emit clientChangedName();
 		break;
 	case NetworkMessage::Type::clientSentMessage:
 		processedData >> clientMessage;
@@ -145,9 +140,4 @@ void QClientConnection::sendNetworkMessage(const QByteArray& toSend)
 {
 	QDataStream dataStream(this);
 	dataStream << toSend;
-}
-
-QClientConnection::~QClientConnection() 
-{
-	qDebug("Delete QClient");
 }

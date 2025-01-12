@@ -12,7 +12,6 @@ class QChatbox : public QTextEdit
 
 public:
 	QChatbox(const QClientInfo& clientInfo, QWidget* parent = nullptr);
-	~QChatbox();
 
 public slots:
 	void appendUserMessage(const QString& from, const QString& message);

@@ -43,8 +43,3 @@ QMenu* QChatlisMenuBar::initServerSettings()
 
 	return serverSettings;
 }
-
-QChatlisMenuBar::~QChatlisMenuBar()
-{
-
-}
