@@ -1,21 +1,21 @@
 set(CLIENT_SOURCE
     src/main.cpp
     src/QChatbox.cpp
-    src/QChatbox.h
+    src/QChatbox.hpp
     src/QChatlisMenuBar.cpp
-    src/QChatlisMenuBar.h
+    src/QChatlisMenuBar.hpp
     src/QChatRoomMainWindow.cpp
-    src/QChatRoomMainWindow.h
+    src/QChatRoomMainWindow.hpp
     src/QChatWidget.cpp
-    src/QChatWidget.h
+    src/QChatWidget.hpp
     src/QParticipantsPanel.cpp
-    src/QParticipantsPanel.h
+    src/QParticipantsPanel.hpp
     src/QServerConnection.cpp
-    src/QServerConnection.h
+    src/QServerConnection.hpp
     src/QParticipantLabel.hpp
 
-    ../common/NetworkMessage.h
-    ../common/QClientInfo.h
+    ../common/NetworkMessage.hpp
+    ../common/QClientInfo.hpp
     ../common/QClientInfo.cpp
 )
 

@@ -1,9 +1,9 @@
 #pragma once
 
 #include <QWidget>
-#include "QChatbox.h"
+#include "QChatbox.hpp"
 #include <QLineEdit>
-#include "QClientInfo.h"
+#include "QClientInfo.hpp"
 
 class QChatWidget : public QWidget
 {

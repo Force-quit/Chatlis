@@ -1,6 +1,6 @@
 #include "QChatlisServer.hpp"
 #include <QtNetwork>
-#include "QClientInfo.h"
+#include "QClientInfo.hpp"
 #include <QPair>
 #include <algorithm>
 

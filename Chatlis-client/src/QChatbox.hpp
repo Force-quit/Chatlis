@@ -1,6 +1,6 @@
 #pragma once
 
-#include "QClientInfo.h"
+#include "QClientInfo.hpp"
 #include <QTextEdit>
 #include <QString>
 #include <QColor>

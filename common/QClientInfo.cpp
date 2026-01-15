@@ -1,4 +1,4 @@
-#include "QClientInfo.h"
+#include "QClientInfo.hpp"
 
 QClientInfo::QClientInfo()
 {

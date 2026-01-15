@@ -1,12 +1,12 @@
-#include "QChatRoomMainWindow.h"
+#include "QChatRoomMainWindow.hpp"
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QSplitter>
-#include "QChatbox.h"
+#include "QChatbox.hpp"
 #include <QTimer>
 #include <QIcon>
-#include "QParticipantsPanel.h"
+#include "QParticipantsPanel.hpp"
 #include <QLineEdit>
 #include <QMenuBar>
 #include <QAction>
@@ -15,9 +15,9 @@
 #include <QInputDialog>
 #include <QMessageBox>
 #include <QGroupBox>
-#include "QServerConnection.h"
-#include "QChatlisMenuBar.h"
-#include "QChatWidget.h"
+#include "QServerConnection.hpp"
+#include "QChatlisMenuBar.hpp"
+#include "QChatWidget.hpp"
 
 QChatRoomMainWindow::QChatRoomMainWindow(QWidget* parent)
 	: QMainWindow(parent), userDisplayName{}, participantsPanel{}, chatWidget{ new QChatWidget(this, localClient) }

@@ -1,14 +1,14 @@
 #pragma once
 
 #include <QMainWindow>
-#include "QChatWidget.h"
+#include "QChatWidget.hpp"
 #include <QMenuBar>
 #include <QMenu>
-#include "QServerConnection.h"
-#include "QParticipantsPanel.h"
+#include "QServerConnection.hpp"
+#include "QParticipantsPanel.hpp"
 #include <QLabel>
 #include <QVBoxLayout>
-#include "QClientInfo.h"
+#include "QClientInfo.hpp"
 
 class QChatRoomMainWindow : public QMainWindow
 {

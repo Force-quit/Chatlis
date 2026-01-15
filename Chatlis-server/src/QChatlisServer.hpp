@@ -2,7 +2,7 @@
 
 #include <QSslServer>
 #include <QList>
-#include "QClientConnection.h"
+#include "QClientConnection.hpp"
 #include <QString>
 
 class QChatlisServer : public QSslServer

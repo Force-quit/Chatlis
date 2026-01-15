@@ -2,7 +2,7 @@
 
 #include <QSslSocket>
 #include <QString>
-#include "QClientInfo.h"
+#include "QClientInfo.hpp"
 #include <QSslKey>
 #include <QSslCertificate>
 

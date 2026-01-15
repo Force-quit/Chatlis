@@ -1,7 +1,7 @@
 #pragma once
 
 #include <QSslSocket>
-#include "QClientInfo.h"
+#include "QClientInfo.hpp"
 #include <QSpan>
 
 class QClientConnection : public QSslSocket

@@ -1,15 +1,15 @@
 set(SERVER_SOURCE
     src/QChatlisServer.hpp
     src/QChatlisServer.cpp
-    src/QClientConnection.h
+    src/QClientConnection.hpp
     src/QClientConnection.cpp
     src/main.cpp
 
     src/QServerMainWindow.hpp
     src/QServerMainWindow.cpp
 
-    ../common/NetworkMessage.h
-    ../common/QClientInfo.h
+    ../common/NetworkMessage.hpp
+    ../common/QClientInfo.hpp
     ../common/QClientInfo.cpp
 )
 
@@ -29,12 +29,12 @@ add_subdirectory(resources)
 set(SERVER_CLI_SOURCE
     src/QChatlisServer.hpp
     src/QChatlisServer.cpp
-    src/QClientConnection.h
+    src/QClientConnection.hpp
     src/QClientConnection.cpp
     src/main-CLI.cpp
 
-    ../common/NetworkMessage.h
-    ../common/QClientInfo.h
+    ../common/NetworkMessage.hpp
+    ../common/QClientInfo.hpp
     ../common/QClientInfo.cpp
 )
 
