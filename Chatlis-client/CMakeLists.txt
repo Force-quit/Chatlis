@@ -27,9 +27,7 @@ set_target_properties(Chatlis-client PROPERTIES
 )
 
 if(WIN32)
-    set_target_properties(Chatlis-client PROPERTIES
-        WIN32_EXECUTABLE ON
-    )
+    set_target_properties(Chatlis-client PROPERTIES WIN32_EXECUTABLE ON)
 endif()
 
 add_subdirectory(resources)
